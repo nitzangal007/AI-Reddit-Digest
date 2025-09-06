@@ -4,11 +4,15 @@ from praw import reddit
 # Load variables from .env if present (development convenience)
 load_dotenv()
 
+# App configuration
 APP_NAME = "AI Reddit Summarizer"
 APP_VERSION = "0.1.0"
 DEFAULT_SUBREDDIT = "machinelearning"
 AI_SUBREDDITS = ["MachineLearning", "artificial", "OpenAI", "LocalLLaMA", "deeplearning", "ChatGPT"]
-TOP_LIMIT = int(os.getenv("TOP_LIMIT") or "5")
+TOP_LIMIT = 5 # Default number of top posts to summarize
+MAX_FETCH_POSTS = 100  # Max posts to fetch from Reddit at once
+MAX_FETCH_COMMENTS = 20     # Max comments to fetch per post
+OVER_FETCH_FACTOR = 5 # Fetch this many times the TOP_LIMIT to allow filtering
 
 
 # Secrets / credentials (required)

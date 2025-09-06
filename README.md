@@ -1,26 +1,46 @@
-# AI Reddit MVP
+## Project Status & MVP Plan
 
-This repository contains my first-year Computer Science project: an AI-powered tool that ingests Reddit posts and produces concise, useful insights. The project is built  to demonstrate end‑to‑end skills: data access, processing, AI summarization, storage, and a simple user interface.
+### Current Status
+- ✅ Repository set up with clean git hygiene (`.gitignore`, `.gitattributes`, `LICENSE`).
+- ✅ Code packaged under `app/` and runnable via `python -m app`.
+- ✅ Reddit client (PRAW) fetches posts by subreddit with `--subreddit/-s` and `--limit/-n`.
+- ✅ Placeholder summarizer in place (`summarize.py`, short 140-char summary).
+- 🔶 README Quickstart & screenshots: **in progress**.
+- 🔶 `.env.example`: **in progress**.
+- 🔶 CLI prints the AI-like `Summary:` line for each post: **in progress**.
+- ⏳ Requirements trimming to core MVP (praw, dotenv, rich).
+- ⏳ Tests / CI: not started.
 
----
+### MVP v0.1 — Scope & Success Criteria
+**Goal:** a minimal, working CLI that fetches subreddit posts and prints a short AI-like summary per post.
 
-## 🎯 Project Goals
-- Learn how to combine **real-world data** (Reddit) with **AI capabilities**.
-- Practice production‑minded coding (repo hygiene, structure, testing basics).
-- Deliver a **working MVP** in ~4–8 weeks that can be extended later.
+**Must-haves**
+- Fetch top posts from a given subreddit (default: `askreddit`) with a configurable limit.
+- For each post, print: **Title**, **Summary** (<= 140 chars, placeholder), and **URL**.
+- Graceful handling of empty bodies or rate limits (fallback to title, simple retries or message).
+- Run via:  
+  ```bash
+  python -m app -s <subreddit> -n <limit>
 
----
+## Quickstart
 
-## 🚀 MVP Scope (Month 1)
-**User Story:** “As a user, I want to fetch the top posts from a subreddit and get AI summaries so I can quickly understand what’s trending.”
+### 1) Requirements
+- Python 3.10+ recommended
+- A Reddit application (to obtain `client_id`, `client_secret`, `user_agent`)
 
-**Core Features**
-1. **Subreddit fetcher** – Fetch top *N* posts from a chosen subreddit (past day/week).
-2. **AI summarizer** – Generate a 1–3 sentence summary per post.
-3. **Storage** – Save raw posts + summaries into a lightweight DB (SQLite).
-4. **Simple UI** – Start with a CLI (command line). Optional: a minimal web page later.
-5. **Export** – Save a CSV/JSON of results for sharing.
+### 2) Setup
+```bash
+# clone & enter
+git clone https://github.com/<your-user>/<your-repo>.git
+cd <your-repo>
 
+# create & activate a virtual env
+python -m venv .venv
+# Windows:
+.\.venv\Scripts\activate
+# macOS/Linux:
+source .venv/bin/activate
 
-## 👤 Author
-Nitzan Gal – First‑year CS student.
+# install dependencies
+pip install -r requirements.txt
+
