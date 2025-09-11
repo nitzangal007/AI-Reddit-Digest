@@ -2,10 +2,9 @@
 # CLI entry point: parse arguments, fetch posts, summarize them
 
 import argparse
-from .config import DEFAULT_SUBREDDIT, TOP_LIMIT
-from .reddit_client import top_posts
-from .reddit_client import hot_post_and_comments
-from .summarize import summarize_text
+from app.config import DEFAULT_SUBREDDIT, TOP_LIMIT
+from app import reddit_client as rc
+from app.summarize import summarize_text
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -39,24 +38,56 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 
-def main(argv=None) -> None:
+def main() -> None:
     """
-    CLI entry point.
-    `argv` allows injecting arguments for testing. If None, uses sys.argv.
+    Main function to parse arguments, fetch posts, and summarize them.
     """
     parser = build_parser()
-    args = parser.parse_args(argv)
+    args = parser.parse_args()
 
     subreddit = args.subreddit
     limit = args.limit
 
-    for i, post in enumerate(hot_post_and_comments(subreddit, limit, comment_limit=3), start=1):
-        print(f"{i}. {post['title']} (score: {post['score']})")
-        print(f"URL: {post['url']}")
-        print("Comments:")
-        for comment in post.get("comments", []):
-            print(f" - {comment}")
-        print()
+    print(f"Fetching top {limit} posts from r/{subreddit}...\n")
 
+    # Fetch posts using the reddit_client module
+    posts = rc.get_posts_with_comments(
+        subreddit=subreddit,
+        sort="top",
+        time_filter="day",
+        requested=limit,
+        comment_limit=5,  # Fetch top 5 comments per post
+        min_score=None    # No minimum score filter for now
+    )
+
+    if not posts:
+        print("No posts found.")
+        return
+
+    for i, post in enumerate(posts, start=1):
+        title = post.get("title", "No Title")
+        selftext = post.get("selftext", "")
+        combined_text = f"{title}\n\n{selftext}"
+
+        print(f"Post {i}: {title}")
+        print(f"URL: {post.get('permalink', 'N/A')}")
+        print(f"Score: {post.get('score', 0)}")
+
+        # Summarize the post content
+        summary = summarize_text(combined_text)
+        print(f"Summary:\n{summary}\n")
+
+        # Print top comments
+        comments = post.get("comments", [])
+        if comments:
+            print("Top Comments:")
+            for c in comments[:5]:  # Show top 5 comments
+                author = c.get("author", "[deleted]")
+                body = c.get("body", "")
+                score = c.get("score", 0)
+                print(f"- {body} (by {author}, ↑{score})")
+            print("\n" + "-"*40 + "\n")
+        else:
+            print("No comments available.\n" + "-"*40 + "\n")
 if __name__ == "__main__":
     main()

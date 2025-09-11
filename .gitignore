@@ -11,4 +11,6 @@ __pycache__/
 # OS files
 .DS_Store
 Thumbs.db
-reddit_smoke_test.py
+tests/reddit_smoke_test.py
+tests/reddit_smoke_client.py
+tests/manual_preview.py.py
