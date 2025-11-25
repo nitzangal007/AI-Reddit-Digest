@@ -16,6 +16,21 @@ MAX_FETCH_COMMENTS = 20     # Max comments to fetch per post
 OVER_FETCH_FACTOR = 5 # Fetch this many times the TOP_LIMIT to allow filtering
 
 
+#Summary configuration
+STOPWORDS={
+        "i", "me", "my", "myself", "we", "our", "ours", "ourselves", "you", "your", "yours",
+        "yourself", "yourselves", "he", "him", "his", "himself", "she", "her", "hers",
+        "herself", "it", "its", "itself", "they", "them", "their", "theirs", "themselves",
+        "what", "which", "who", "whom", "this", "that", "these", "those", "am", "is", "are",
+        "was", "were", "be", "been", "being", "have", "has", "had", "having", "do", "does",
+        "did", "doing", "a", "an", "the", "and", "but", "if", "or", "because", "as",
+        "until", "while",  # Removed 'of' from STOPWORDS
+        # Add more STOPWORDS as needed
+    }
+
+
+
+
 # Secrets / credentials (required)
 REDDIT_CLIENT_ID = os.getenv("REDDIT_CLIENT_ID")
 REDDIT_CLIENT_SECRET = os.getenv("REDDIT_CLIENT_SECRET")
