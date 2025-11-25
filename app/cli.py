@@ -4,7 +4,7 @@
 import argparse
 from app.config import DEFAULT_SUBREDDIT, TOP_LIMIT
 from app import reddit_client as rc
-from app.summarize import summarize_text
+from app.summarize import summarize_post
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -67,14 +67,13 @@ def main() -> None:
     for i, post in enumerate(posts, start=1):
         title = post.get("title", "No Title")
         selftext = post.get("selftext", "")
-        combined_text = f"{title}\n\n{selftext}"
 
         print(f"Post {i}: {title}")
         print(f"URL: {post.get('permalink', 'N/A')}")
         print(f"Score: {post.get('score', 0)}")
 
         # Summarize the post content
-        summary = summarize_text(combined_text)
+        summary = summarize_post(title, selftext, max_char=320)
         print(f"Summary:\n{summary}\n")
 
         # Print top comments
