@@ -1,7 +1,11 @@
 import praw, praw.models, time
+import warnings
 from typing import Optional, List, TypedDict, NotRequired
 from .config import *
 from typing import Literal
+
+# Suppress PRAW async warning (we use sync PRAW in async context intentionally)
+warnings.filterwarnings("ignore", message=".*PRAW.*asynchronous.*")
 
 Sort = Literal["hot", "new", "top"]
 TopWindow = Literal["hour","day","week","month","year","all"]
@@ -103,7 +107,7 @@ def _is_valid_submission(
     min_score: int | None = None,
     allow_stickied: bool = False,
     min_title_len: int = 10,
-    only_text_posts: bool = True,   # NEW
+    only_text_posts: bool = False,   # Allow link posts (news, sports often link)
     ) -> bool:
     if getattr(sub, "stickied", False) and not allow_stickied:
         return False
@@ -147,7 +151,7 @@ def get_posts(
     out: list[PostData] = []
 
     for sub in _iter_posts(sr, sort=sort, limit=limit, time_filter=time_filter):
-        if not _is_valid_submission(sub, min_score=min_score, allow_stickied=False, min_title_len=10, only_text_posts=True):
+        if not _is_valid_submission(sub, min_score=min_score, allow_stickied=False, min_title_len=10, only_text_posts=False):
             continue
         # Passed all filters; include it
         out.append(submission_to_post_data(sub))
@@ -256,7 +260,7 @@ def get_posts_with_comments(
     limit = _compute_fetch_limit(requested, min_score)
     out: list[PostData] = []
     for sub in _iter_posts(sr, sort=sort, limit=limit, time_filter=time_filter):
-        if not _is_valid_submission(sub, min_score=min_score, allow_stickied=False, min_title_len=10, only_text_posts=True):
+        if not _is_valid_submission(sub, min_score=min_score, allow_stickied=False, min_title_len=10, only_text_posts=False):
             continue
         post=submission_to_post_data(sub)
         comment=fetch_comments_flat_with_context(sub, comment_limit=comment_limit, sort="top")

@@ -4,16 +4,65 @@ from praw import reddit
 # Load variables from .env if present (development convenience)
 load_dotenv()
 
-# App configuration
-APP_NAME = "AI Reddit Summarizer"
-APP_VERSION = "0.1.0"
+# =============================================================================
+# App Configuration
+# =============================================================================
+APP_NAME = "Reddit Digest"
+APP_VERSION = "0.2.0"
 DEFAULT_SUBREDDIT = "machinelearning"
-AI_SUBREDDITS = ["MachineLearning", "artificial", "OpenAI", "LocalLLaMA", "deeplearning", "ChatGPT"]
-TOP_LIMIT = 5 # Default number of top posts to summarize  # Default minimum score for posts to consider
+TOP_LIMIT = 10  # Default number of top posts to summarize
 DEFAULT_COMMENT_LIMIT = 5  # Default number of top comments to fetch per post
 MAX_FETCH_POSTS = 100  # Max posts to fetch from Reddit at once
-MAX_FETCH_COMMENTS = 20     # Max comments to fetch per post
-OVER_FETCH_FACTOR = 5 # Fetch this many times the TOP_LIMIT to allow filtering
+MAX_FETCH_COMMENTS = 20  # Max comments to fetch per post
+OVER_FETCH_FACTOR = 5  # Fetch this many times the TOP_LIMIT to allow filtering
+
+# =============================================================================
+# Gemini AI Configuration
+# =============================================================================
+# Accept both GEMINI_API_KEY and OPENAI_API_KEY (in case user named it differently)
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY") or os.getenv("OPENAI_API_KEY")
+GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")  # Stable base model
+
+# =============================================================================
+# Telegram Bot Configuration
+# =============================================================================
+TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
+
+# =============================================================================
+# Topic to Subreddit Mapping
+# =============================================================================
+TOPIC_SUBREDDIT_MAP = {
+    # Technology & AI
+    "tech": ["technology", "gadgets", "hardware", "software", "TechNewsToday"],
+    "ai": ["MachineLearning", "artificial", "OpenAI", "LocalLLaMA", "ChatGPT", "deeplearning"],
+    "programming": ["programming", "learnprogramming", "webdev", "Python", "javascript", "coding"],
+    
+    # Sports
+    "sports": ["sports", "nba", "soccer", "nfl", "baseball", "hockey"],
+    "football": ["soccer", "football", "PremierLeague", "LaLiga", "Bundesliga"],
+    "basketball": ["nba", "basketball", "NBAdiscussion"],
+    
+    # Politics
+    "politics": ["politics", "worldnews", "news", "PoliticalDiscussion", "geopolitics"],
+    "uspolitics": ["politics", "Conservative", "democrats", "Republican"],
+    "worldpolitics": ["worldnews", "geopolitics", "europe", "worldpolitics"],
+    
+    # Gaming
+    "gaming": ["gaming", "Games", "pcgaming", "PS5", "XboxSeriesX", "NintendoSwitch"],
+    
+    # Crypto & Finance
+    "crypto": ["CryptoCurrency", "Bitcoin", "ethereum", "CryptoMarkets"],
+    "finance": ["finance", "stocks", "investing", "wallstreetbets"],
+    
+    # Science
+    "science": ["science", "Physics", "biology", "chemistry", "space"],
+    
+    # General News
+    "news": ["news", "worldnews", "UpliftingNews", "nottheonion"],
+}
+
+# Legacy compatibility
+AI_SUBREDDITS = TOPIC_SUBREDDIT_MAP["ai"]
 
 
 #Summary configuration
