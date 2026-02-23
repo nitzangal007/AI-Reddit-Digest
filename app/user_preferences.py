@@ -29,8 +29,8 @@ class UserPreferences:
     min_score: int = 10
     
     # Automation preferences
-    weekly_digest_enabled: bool = False
-    weekly_digest_day: str = "sunday"  # Day of week for weekly digest
+    weekly_digest_enabled: bool = True
+    weekly_digest_day: str = "Sunday"  # Day of week for weekly digest
     weekly_digest_topics: list[str] = field(default_factory=lambda: ["tech", "ai"])
     
     # Cache preferences (for cost reduction)

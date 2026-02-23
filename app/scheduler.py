@@ -76,6 +76,13 @@ def run_scheduled_digests():
 
 def schedule_weekly_digest(day: str = "sunday", time_str: str = "09:00"):
     """Schedule the weekly digest job."""
+    import os
+    test_interval = os.getenv("DIGEST_TEST_INTERVAL_MINUTES")
+    if test_interval:
+        minutes = int(test_interval)
+        schedule.every(minutes).minutes.do(run_scheduled_digests)
+        console.print(f"🧪 TEST MODE: digest scheduled every {minutes} minute(s)")
+        return
     day_map = {
         "sunday": schedule.every().sunday,
         "monday": schedule.every().monday,
