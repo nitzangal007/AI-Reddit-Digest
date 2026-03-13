@@ -14,3 +14,5 @@ Thumbs.db
 TECHNICAL_INTERVIEW_GUIDE.md
 tests/
 docs/
+test_3b_integration.py
+test_stage_3b.py
