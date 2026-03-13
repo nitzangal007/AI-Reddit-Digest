@@ -2,11 +2,14 @@
 # AI Summarization Engine using Google Gemini
 # Universal topic-aware prompts, mismatch detection, and grounded responses
 
+import logging
 import google.generativeai as genai
 from typing import Optional, List, Dict
 from dataclasses import dataclass
 from .config import GEMINI_API_KEY, GEMINI_MODEL
 from .reddit_client import PostData
+
+logger = logging.getLogger(__name__)
 
 # =============================================================================
 # Gemini Configuration
@@ -171,8 +174,20 @@ def detect_topic_mismatch(expected_topic: str, posts: list[PostData]) -> tuple[b
     if detected_topic != expected_topic:
         if detected_ratio >= 0.5 and expected_ratio < 0.2:
             confidence = detected_ratio - expected_ratio
+            logger.warning(
+                "[AI] Topic mismatch detected: expected=%s, detected=%s, "
+                "confidence=%.2f, expected_ratio=%.2f, detected_ratio=%.2f",
+                expected_topic, detected_topic, confidence,
+                expected_ratio, detected_ratio
+            )
             return True, detected_topic, confidence
     
+    logger.debug(
+        "[AI] No mismatch: expected=%s, detected=%s, "
+        "expected_ratio=%.2f, detected_ratio=%.2f",
+        expected_topic, detected_topic,
+        expected_ratio, detected_ratio
+    )
     return False, "", 0.0
 
 
@@ -232,7 +247,9 @@ Number of posts: {num_posts}
 3. If the user asked a comparative question (which is best/preferred), give a clear answer with evidence.
 4. Always ground your claims in the Reddit data (e.g., "Based on this week's discussions...")
 5. If posts don't contain enough info to answer, say so honestly.
-6. Sound like a friendly, knowledgeable Reddit power-user, not a corporate blog."""
+6. Sound like a friendly, knowledgeable Reddit power-user, not a corporate blog.
+7. For any claim that is not directly confirmed by an official source, explicitly prefix it with a qualifier such as 'According to community speculation,' or 'Unconfirmed reports suggest.' Never present community opinion or rumor as established fact.
+8. Ensure your summary covers multiple distinct topics or angles when available. Do not let a single controversy or viral post dominate the entire response."""
 
     # Intent-specific formatting
     if intent == "highlights":
@@ -450,11 +467,29 @@ def generate_response(
     """
     # Handle no posts
     if not posts:
+        logger.info(
+            "[AI] No posts available: topic=%s, query='%s'",
+            topic, user_question[:60]
+        )
         return get_no_posts_response(topic, time_range, detected_entities)
     
     # Check for topic mismatch
-    is_mismatch, actual_topic, confidence = detect_topic_mismatch(topic, posts)
+    # SKIPPING if explicit entities were detected. 
+    # The NLU registry is highly accurate. If it routed via an entity override (e.g. 'TFT' -> 'TeamfightTactics'), 
+    # we shouldn't let the LLM's generic keyword detector second-guess it.
+    is_mismatch = False
+    actual_topic = ""
+    confidence = 0.0
+    
+    if not detected_entities:
+        is_mismatch, actual_topic, confidence = detect_topic_mismatch(topic, posts)
+        
     if is_mismatch and confidence > 0.3:
+        logger.warning(
+            "[AI] Returning mismatch response: expected=%s, actual=%s, "
+            "confidence=%.2f, query='%s'",
+            topic, actual_topic, confidence, user_question[:60]
+        )
         return get_mismatch_response(topic, actual_topic, user_question, posts, time_range)
     
     # Format posts
@@ -488,9 +523,19 @@ def generate_response(
     # Generate response
     model = get_gemini_model()
     try:
+        logger.info(
+            "[AI] Generating response: topic=%s, intent=%s, "
+            "posts=%d, is_followup=%s, query='%s'",
+            topic, intent, len(posts), is_followup,
+            user_question[:60]
+        )
         response = model.generate_content(prompt)
         return response.text.strip()
     except Exception as e:
+        logger.error(
+            "[AI] Error generating response: %s, query='%s'",
+            e, user_question[:60]
+        )
         return f"Error generating response: {str(e)}"
 
 

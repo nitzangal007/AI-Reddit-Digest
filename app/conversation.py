@@ -2,9 +2,12 @@
 # Interactive conversation handler for chat mode
 # Improved with follow-up/correction detection and topic-aware refetching
 
+import logging
 from typing import Optional
 from dataclasses import dataclass, field
 import re
+
+logger = logging.getLogger(__name__)
 
 from . import reddit_client as rc
 from .nlu import (
@@ -94,7 +97,7 @@ def detect_topic_correction(message: str) -> Optional[tuple[str, list[str]]]:
     
     if is_correction or len(msg_lower.split()) <= 8:
         # Try to extract a new topic from the message
-        new_topic, entities = extract_topic_with_entities(message)
+        new_topic, entities, _confidence = extract_topic_with_entities(message)
         if new_topic != "tech" or entities:  # Found something specific
             return new_topic, entities
     
@@ -167,7 +170,8 @@ def merge_with_previous(
         original_query=new_message,
         language=previous.language,
         limit=previous.limit,
-        detected_entities=previous.detected_entities.copy() if previous.detected_entities else []
+        detected_entities=previous.detected_entities.copy() if previous.detected_entities else [],
+        confidence=previous.confidence
     )
     
     if follow_type == "time_change":
@@ -184,12 +188,35 @@ def merge_with_previous(
             merged.topic = new_topic
             merged.subreddits = map_topic_to_subreddits(new_topic, entities)
             merged.detected_entities = entities
+            # Recalculate confidence for the new topic — don't inherit stale confidence
+            merged.confidence = "high" if entities else "medium"
     
     elif follow_type == "continuation":
         # Keep everything, just increase the limit
         merged.limit = min(previous.limit + 5, 20)
     
     return merged
+
+
+# =============================================================================
+# Safe Fallback Response (Stage 2)
+# =============================================================================
+
+def get_safe_fallback_response(query_terms: str) -> str:
+    """
+    Return a helpful response when the NLU cannot confidently match a topic.
+    This prevents the system from fetching and summarizing irrelevant content.
+    """
+    return f"""I don't have coverage for **"{query_terms}"** right now.
+
+This usually means the topic isn't in my current knowledge base.
+
+**What you can try:**
+- Rephrase with a broader topic (e.g., "gaming news" instead of a specific game title)
+- Mention a well-known entity I might recognize (e.g., "Elden Ring", "Bitcoin", "GPT-4")
+- Type `/topics` to see what topics I currently cover
+
+I'm being expanded to cover more topics soon!"""
 
 
 # =============================================================================
@@ -284,12 +311,21 @@ Just ask about any of these naturally!
                 **cache_key_params
             )
             if cached:
+                logger.info(
+                    "[CONV] Cache hit: topic=%s, subreddits=%s, posts=%d",
+                    parsed.topic, parsed.subreddits, len(cached)
+                )
                 print_info("Using cached data")
                 return cached
         
         # Fetch from Reddit - balance breadth vs speed
         all_posts = []
         subreddits_to_try = parsed.subreddits[:3]  # Limit to 3 subreddits for speed
+        
+        logger.info(
+            "[CONV] Fetching posts: subreddits=%s, time=%s, topic=%s",
+            subreddits_to_try, parsed.time_range, parsed.topic
+        )
         
         for subreddit in subreddits_to_try:
             try:
@@ -302,12 +338,25 @@ Just ask about any of these naturally!
                     min_score=None  # No score filter for broader results
                 )
                 all_posts.extend(posts)
+                logger.debug(
+                    "[CONV] Fetched %d posts from r/%s",
+                    len(posts), subreddit
+                )
             except Exception as e:
+                logger.warning(
+                    "[CONV] Failed to fetch from r/%s: %s",
+                    subreddit, e
+                )
                 print_warning(f"Could not fetch from r/{subreddit}: {e}")
         
         all_posts.sort(key=lambda p: p.get('score', 0), reverse=True)
         # Keep up to 10 posts for AI
         all_posts = all_posts[:10]
+        
+        logger.info(
+            "[CONV] Fetch complete: total_posts=%d, topic=%s, subreddits=%s",
+            len(all_posts), parsed.topic, subreddits_to_try
+        )
         
         # Cache the results
         if self.preferences.cache_enabled and all_posts:
@@ -339,7 +388,8 @@ Just ask about any of these naturally!
                 original_query=parsed.original_query,
                 language=parsed.language,
                 limit=parsed.limit,
-                detected_entities=parsed.detected_entities
+                detected_entities=parsed.detected_entities,
+                confidence=parsed.confidence
             )
             posts = self._fetch_posts(broader_query, use_cache=True)
             if len(posts) >= 3:
@@ -382,6 +432,18 @@ Just ask about any of these naturally!
         # Show thinking indicator
         print_thinking()
         
+        # === STAGE 2: Safe Fallback Gate ===
+        # If NLU confidence is 'default' (nothing matched), don't fetch irrelevant posts
+        if parsed.confidence == "default":
+            # Extract the user's original terms for a helpful message
+            query_terms = user_message.strip()
+            logger.warning(
+                "[CONV] Safe fallback triggered: confidence=DEFAULT, "
+                "query='%s', would_have_fetched=%s",
+                query_terms[:60], parsed.subreddits
+            )
+            return get_safe_fallback_response(query_terms)
+        
         # Fetch posts
         posts = self._fetch_posts(parsed)
         
@@ -393,6 +455,15 @@ Just ask about any of these naturally!
                 posts = broader_posts
         
         self.context.last_posts = posts
+        
+        logger.info(
+            "[CONV] Pipeline: query='%s', follow_type=%s, topic=%s, "
+            "entities=%s, subreddits=%s, posts_fetched=%d%s",
+            user_message[:60], follow_type, parsed.topic,
+            parsed.detected_entities, parsed.subreddits,
+            len(posts),
+            f", broadened: {adjustment_msg}" if adjustment_msg else ""
+        )
         
         # Show posts table
         if posts:

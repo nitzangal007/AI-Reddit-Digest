@@ -36,7 +36,11 @@ class TelegramUserPreferences:
     daily_digest_enabled: bool = False
     weekly_digest_enabled: bool = False
     digest_hour: int = 9                            # Hour of day (0-23) for digests
+    digest_minute: int = 0                          # Minute of hour (0-59) for digests
     weekly_digest_day: str = "sunday"
+    
+    # Email delivery
+    email_digest_enabled: bool = False              # Send digest copies to email
     
     # Onboarding state
     onboarding_complete: bool = False
@@ -79,6 +83,9 @@ class TelegramUserPreferences:
         data['daily_digest_enabled'] = bool(data['daily_digest_enabled'])
         data['weekly_digest_enabled'] = bool(data['weekly_digest_enabled'])
         data['onboarding_complete'] = bool(data['onboarding_complete'])
+        data['email_digest_enabled'] = bool(data.get('email_digest_enabled', 0))
+        # Ensure digest_minute exists (migration safety)
+        data.setdefault('digest_minute', 0)
         return cls(**data)
 
 
@@ -110,7 +117,9 @@ def _init_db(conn: sqlite3.Connection):
             daily_digest_enabled INTEGER DEFAULT 0,
             weekly_digest_enabled INTEGER DEFAULT 0,
             digest_hour INTEGER DEFAULT 9,
+            digest_minute INTEGER DEFAULT 0,
             weekly_digest_day TEXT DEFAULT 'sunday',
+            email_digest_enabled INTEGER DEFAULT 0,
             onboarding_complete INTEGER DEFAULT 0,
             onboarding_step TEXT DEFAULT '',
             language TEXT DEFAULT 'en',
@@ -119,6 +128,15 @@ def _init_db(conn: sqlite3.Connection):
             updated_at TEXT
         )
     """)
+    # Safe migration for existing databases
+    for col, default in [
+        ("digest_minute", "0"),
+        ("email_digest_enabled", "0"),
+    ]:
+        try:
+            conn.execute(f"ALTER TABLE users ADD COLUMN {col} INTEGER DEFAULT {default}")
+        except sqlite3.OperationalError:
+            pass  # Column already exists
     conn.commit()
 
 
@@ -188,29 +206,31 @@ def delete_user(chat_id: int) -> bool:
     return True
 
 
-def get_users_for_daily_digest(hour: int) -> List[TelegramUserPreferences]:
-    """Get all users who need daily digest at the specified hour."""
+def get_users_for_daily_digest(hour: int, minute: int) -> List[TelegramUserPreferences]:
+    """Get all users who need daily digest at the specified hour and minute."""
     conn = get_connection()
     cursor = conn.execute("""
         SELECT * FROM users 
         WHERE daily_digest_enabled = 1 
         AND digest_hour = ?
+        AND digest_minute = ?
         AND onboarding_complete = 1
-    """, (hour,))
+    """, (hour, minute))
     
     return [TelegramUserPreferences.from_row(row) for row in cursor.fetchall()]
 
 
-def get_users_for_weekly_digest(day: str, hour: int) -> List[TelegramUserPreferences]:
-    """Get all users who need weekly digest on the specified day and hour."""
+def get_users_for_weekly_digest(day: str, hour: int, minute: int) -> List[TelegramUserPreferences]:
+    """Get all users who need weekly digest on the specified day, hour, and minute."""
     conn = get_connection()
     cursor = conn.execute("""
         SELECT * FROM users 
         WHERE weekly_digest_enabled = 1 
         AND weekly_digest_day = ?
         AND digest_hour = ?
+        AND digest_minute = ?
         AND onboarding_complete = 1
-    """, (day.lower(), hour))
+    """, (day.lower(), hour, minute))
     
     return [TelegramUserPreferences.from_row(row) for row in cursor.fetchall()]
 
@@ -234,7 +254,9 @@ def get_user_preferences_summary(user: TelegramUserPreferences) -> str:
     
     daily_status = "✅ Enabled" if user.daily_digest_enabled else "❌ Disabled"
     weekly_status = "✅ Enabled" if user.weekly_digest_enabled else "❌ Disabled"
-    email_status = user.email if user.email else "Not set"
+    email_delivery = "✅ Enabled" if user.email_digest_enabled else "❌ Disabled"
+    email_addr = user.email if user.email else "Not set"
+    digest_time = f"{user.digest_hour:02d}:{user.digest_minute:02d}"
     
     return f"""⚙️ **Your Settings**
 
@@ -245,9 +267,9 @@ def get_user_preferences_summary(user: TelegramUserPreferences) -> str:
 **Notifications:**
 • Daily Digest: {daily_status}
 • Weekly Digest: {weekly_status}
-• Digest Time: {user.digest_hour}:00
-{f'• Weekly Day: {user.weekly_digest_day.capitalize()}' if user.weekly_digest_enabled else ''}
-• Email: {email_status}
+{f'• Weekly Day: {user.weekly_digest_day.capitalize()}' + chr(10) if user.weekly_digest_enabled else ''}• Digest Time: {digest_time}
+• Email: {email_addr}
+• Email Delivery: {email_delivery}
 
 **Other:**
 • Min Score: {user.min_score}

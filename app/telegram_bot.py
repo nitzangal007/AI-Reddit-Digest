@@ -2,6 +2,7 @@
 # Telegram bot entry point with handlers and onboarding flow
 
 import os
+import re
 import asyncio
 import logging
 from datetime import time
@@ -31,6 +32,19 @@ from .user_store import (
 )
 from .conversation import ConversationHandler as RedditConversationHandler
 from .scheduler import generate_weekly_digest
+from .email_notifier import (
+    is_email_configured,
+    send_daily_digest_email,
+    send_weekly_digest_email,
+)
+
+# Regex for HH:MM validation
+TIME_PATTERN = re.compile(r'^([01]\d|2[0-3]):([0-5]\d)$')
+
+VALID_DAYS = [
+    "sunday", "monday", "tuesday", "wednesday",
+    "thursday", "friday", "saturday",
+]
 
 # Configure logging
 logging.basicConfig(
@@ -343,8 +357,56 @@ async def cancel_onboarding(update: Update, context: ContextTypes.DEFAULT_TYPE) 
     return TGConversationHandler.END
 
 
+def _build_settings_keyboard(user: TelegramUserPreferences) -> InlineKeyboardMarkup:
+    """Build an inline keyboard for interactive settings."""
+    daily_label = "✅ Daily Digest" if user.daily_digest_enabled else "❌ Daily Digest"
+    weekly_label = "✅ Weekly Digest" if user.weekly_digest_enabled else "❌ Weekly Digest"
+    email_label = "✅ Email Delivery" if user.email_digest_enabled else "❌ Email Delivery"
+    time_label = f"⏰ Time: {user.digest_hour:02d}:{user.digest_minute:02d}"
+    day_label = f"📅 Day: {user.weekly_digest_day.capitalize()}"
+    
+    keyboard = [
+        [InlineKeyboardButton(daily_label, callback_data="toggle_daily")],
+        [InlineKeyboardButton(weekly_label, callback_data="toggle_weekly")],
+        [InlineKeyboardButton(email_label, callback_data="toggle_email")],
+        [
+            InlineKeyboardButton(time_label, callback_data="pick_time"),
+            InlineKeyboardButton(day_label, callback_data="pick_day"),
+        ],
+        [InlineKeyboardButton("🔄 Refresh", callback_data="refresh_settings")],
+    ]
+    return InlineKeyboardMarkup(keyboard)
+
+
+def _build_time_picker_keyboard() -> InlineKeyboardMarkup:
+    """Build an inline keyboard with common time slots."""
+    times = [
+        "06:00", "07:00", "08:00",
+        "09:00", "10:00", "12:00",
+        "14:00", "16:00", "18:00",
+        "20:00", "21:00", "22:00",
+    ]
+    rows = []
+    for i in range(0, len(times), 3):
+        row = [InlineKeyboardButton(t, callback_data=f"set_time_{t}") for t in times[i:i+3]]
+        rows.append(row)
+    rows.append([InlineKeyboardButton("⬅️ Back", callback_data="back_to_settings")])
+    return InlineKeyboardMarkup(rows)
+
+
+def _build_day_picker_keyboard() -> InlineKeyboardMarkup:
+    """Build an inline keyboard with days of the week."""
+    days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
+    rows = []
+    for i in range(0, len(days), 2):
+        row = [InlineKeyboardButton(d, callback_data=f"set_day_{d.lower()}") for d in days[i:i+2]]
+        rows.append(row)
+    rows.append([InlineKeyboardButton("⬅️ Back", callback_data="back_to_settings")])
+    return InlineKeyboardMarkup(rows)
+
+
 async def settings_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    """Handle /settings command - show current preferences."""
+    """Handle /settings command - show interactive preferences panel."""
     chat_id = update.effective_chat.id
     user = get_user(chat_id)
     
@@ -352,49 +414,131 @@ async def settings_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -
         await update.message.reply_text("Please use /start first to set up your preferences.")
         return
     
-    await update.message.reply_text(get_user_preferences_summary(user), parse_mode='Markdown')
+    keyboard = _build_settings_keyboard(user)
+    await update.message.reply_text(
+        get_user_preferences_summary(user),
+        parse_mode='Markdown',
+        reply_markup=keyboard
+    )
+
+
+async def settings_callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Handle inline keyboard button presses from the settings panel."""
+    query = update.callback_query
+    await query.answer()  # Acknowledge the callback
+    
+    chat_id = query.message.chat_id
+    user = get_user(chat_id)
+    if not user:
+        await query.edit_message_text("Please use /start first.")
+        return
+    
+    data = query.data
+    
+    if data == "toggle_daily":
+        user.daily_digest_enabled = not user.daily_digest_enabled
+        update_user(user)
+    elif data == "toggle_weekly":
+        user.weekly_digest_enabled = not user.weekly_digest_enabled
+        update_user(user)
+    elif data == "toggle_email":
+        if not user.email_digest_enabled:
+            if not user.email:
+                await query.answer("⚠️ Set an email first with /set_email", show_alert=True)
+                return
+            if not is_email_configured():
+                await query.answer("⚠️ SMTP not configured on server", show_alert=True)
+                return
+        user.email_digest_enabled = not user.email_digest_enabled
+        update_user(user)
+    elif data == "pick_time":
+        await query.edit_message_text(
+            "⏰ Select digest time:",
+            reply_markup=_build_time_picker_keyboard()
+        )
+        return
+    elif data == "pick_day":
+        await query.edit_message_text(
+            "📅 Select weekly digest day:",
+            reply_markup=_build_day_picker_keyboard()
+        )
+        return
+    elif data.startswith("set_time_"):
+        time_val = data[len("set_time_"):]
+        h, m = map(int, time_val.split(":"))
+        user.digest_hour = h
+        user.digest_minute = m
+        update_user(user)
+    elif data.startswith("set_day_"):
+        day_val = data[len("set_day_"):]
+        user.weekly_digest_day = day_val
+        update_user(user)
+    elif data == "back_to_settings":
+        pass  # Fall through to refresh below
+    elif data == "refresh_settings":
+        pass  # Just refresh the panel below
+    
+    # Refresh the settings panel
+    keyboard = _build_settings_keyboard(user)
+    await query.edit_message_text(
+        get_user_preferences_summary(user),
+        parse_mode='Markdown',
+        reply_markup=keyboard
+    )
 
 
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Handle /help command."""
-    help_text = """📚 **Available Commands**
+    help_text = """📚 <b>Available Commands</b>
 
-**Setup & Settings:**
+<b>Setup &amp; Settings:</b>
 • /start - Begin setup or view settings
-• /settings - Show your preferences
+• /settings - View &amp; change preferences (interactive)
 • /reset - Clear all preferences and restart
 
-**Customize:**
+<b>Customize:</b>
 • /set_subreddits - Change followed subreddits
 • /set_topics - Change topics of interest
-• /set_frequency - Change digest frequency
+• /set_frequency - Set schedule (e.g. <code>weekly monday 08:30</code>)
+• /set_time - Set digest time (e.g. <code>08:30</code>)
 
-**Digests:**
-• /weekly on - Enable weekly digest
-• /weekly off - Disable weekly digest
+<b>Digests:</b>
+• /weekly on|off - Toggle weekly digest
 • /digest - Get a digest right now
 
-**Other:**
+<b>Email:</b>
+• /set_email - Set or clear email address
+• /email_digest on|off - Toggle email delivery
+
+<b>Other:</b>
 • /help - Show this message
 • /topics - List available topics
 
-**Chat:**
+<b>Chat:</b>
 Just type naturally! Ask things like:
 • "What's new in AI this week?"
 • "Show me trending posts in gaming"
 • "Summarize the top tech news"
 """
-    await update.message.reply_text(help_text, parse_mode='Markdown')
+    await update.message.reply_text(help_text, parse_mode='HTML')
 
 
 async def topics_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Handle /topics command - list available topics."""
-    topics_list = "\n".join([f"• **{topic}**" for topic in TOPIC_SUBREDDIT_MAP.keys()])
-    await update.message.reply_text(
-        f"📋 **Available Topics:**\n\n{topics_list}\n\n"
-        "Use /set_topics to change your preferences.",
-        parse_mode='Markdown'
-    )
+    try:
+        topics_list = "\n".join([f"• <b>{topic}</b>" for topic in TOPIC_SUBREDDIT_MAP.keys()])
+        await update.message.reply_text(
+            f"📋 <b>Available Topics:</b>\n\n{topics_list}\n\n"
+            "Use /set_topics to change your preferences.",
+            parse_mode='HTML'
+        )
+    except Exception as e:
+        logger.error(f"Error in /topics command: {e}")
+        # Fallback without formatting
+        topics_list = "\n".join([f"• {topic}" for topic in TOPIC_SUBREDDIT_MAP.keys()])
+        await update.message.reply_text(
+            f"📋 Available Topics:\n\n{topics_list}\n\nUse /set_topics to change your preferences."
+        )
 
 
 async def reset_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -494,7 +638,14 @@ async def set_topics_command(update: Update, context: ContextTypes.DEFAULT_TYPE)
 
 
 async def set_frequency_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    """Handle /set_frequency command."""
+    """Handle /set_frequency command.
+    
+    Supports:
+        /set_frequency daily|weekly|both|none
+        /set_frequency weekly monday
+        /set_frequency weekly monday 08:30
+        /set_frequency daily 14:00
+    """
     chat_id = update.effective_chat.id
     user = get_user(chat_id)
     
@@ -513,27 +664,184 @@ async def set_frequency_command(update: Update, context: ContextTypes.DEFAULT_TY
         elif freq == "both":
             user.daily_digest_enabled = True
             user.weekly_digest_enabled = True
-        elif freq == "none" or freq == "off":
+        elif freq in ("none", "off"):
             user.daily_digest_enabled = False
             user.weekly_digest_enabled = False
         else:
-            await update.message.reply_text("❌ Invalid option. Use: daily, weekly, both, or none")
+            await update.message.reply_text(
+                "❌ Invalid option. Use: daily, weekly, both, or none\n"
+                "Example: `/set_frequency weekly monday 08:30`",
+                parse_mode='Markdown'
+            )
             return
         
+        # Parse optional day argument (for weekly/both)
+        if len(context.args) >= 2:
+            day_arg = context.args[1].lower()
+            if day_arg in VALID_DAYS:
+                user.weekly_digest_day = day_arg
+            elif TIME_PATTERN.match(day_arg):
+                # User passed time as 2nd arg (e.g. /set_frequency daily 08:00)
+                h, m = map(int, day_arg.split(':'))
+                user.digest_hour = h
+                user.digest_minute = m
+        
+        # Parse optional time argument
+        if len(context.args) >= 3:
+            time_arg = context.args[2]
+            match = TIME_PATTERN.match(time_arg)
+            if match:
+                user.digest_hour = int(match.group(1))
+                user.digest_minute = int(match.group(2))
+            else:
+                await update.message.reply_text(
+                    f"⚠️ Invalid time format: {time_arg}. Use HH:MM (e.g. 08:30)"
+                )
+        
         update_user(user)
-        await update.message.reply_text(f"✅ Frequency updated!")
+        
+        # Build confirmation
+        parts = []
+        if user.daily_digest_enabled:
+            parts.append("Daily")
+        if user.weekly_digest_enabled:
+            parts.append(f"Weekly ({user.weekly_digest_day.capitalize()})")
+        freq_text = " & ".join(parts) if parts else "None (manual only)"
+        time_text = f"{user.digest_hour:02d}:{user.digest_minute:02d}"
+        
+        await update.message.reply_text(
+            f"✅ Frequency updated!\n"
+            f"📋 Schedule: {freq_text}\n"
+            f"🕐 Time: {time_text}"
+        )
     else:
         status = []
         if user.daily_digest_enabled:
             status.append("Daily")
         if user.weekly_digest_enabled:
-            status.append("Weekly")
+            status.append(f"Weekly ({user.weekly_digest_day.capitalize()})")
         current = " & ".join(status) if status else "None (manual only)"
+        time_text = f"{user.digest_hour:02d}:{user.digest_minute:02d}"
         
         await update.message.reply_text(
-            f"**Current frequency:** {current}\n\n"
+            f"**Current frequency:** {current}\n"
+            f"**Time:** {time_text}\n\n"
             "To change, use:\n"
-            "`/set_frequency daily|weekly|both|none`",
+            "`/set_frequency daily|weekly|both|none`\n"
+            "`/set_frequency weekly monday 08:30`\n"
+            "`/set_frequency daily 14:00`",
+            parse_mode='Markdown'
+        )
+
+
+async def set_time_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Handle /set_time command - set digest delivery time."""
+    chat_id = update.effective_chat.id
+    user = get_user(chat_id)
+    
+    if not user:
+        await update.message.reply_text("Please use /start first.")
+        return
+    
+    if context.args:
+        time_str = context.args[0]
+        match = TIME_PATTERN.match(time_str)
+        if match:
+            user.digest_hour = int(match.group(1))
+            user.digest_minute = int(match.group(2))
+            update_user(user)
+            await update.message.reply_text(
+                f"✅ Digest time set to **{user.digest_hour:02d}:{user.digest_minute:02d}**",
+                parse_mode='Markdown'
+            )
+        else:
+            await update.message.reply_text(
+                "❌ Invalid time format. Use HH:MM (24-hour).\n"
+                "Example: `/set_time 08:30`",
+                parse_mode='Markdown'
+            )
+    else:
+        current = f"{user.digest_hour:02d}:{user.digest_minute:02d}"
+        await update.message.reply_text(
+            f"**Current digest time:** {current}\n\n"
+            "To change, use:\n"
+            "`/set_time 08:30`",
+            parse_mode='Markdown'
+        )
+
+
+async def set_email_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Handle /set_email command - set or clear email address."""
+    chat_id = update.effective_chat.id
+    user = get_user(chat_id)
+    
+    if not user:
+        await update.message.reply_text("Please use /start first.")
+        return
+    
+    if context.args:
+        email_input = context.args[0].strip()
+        if email_input.lower() == "off":
+            user.email = ""
+            user.email_digest_enabled = False
+            update_user(user)
+            await update.message.reply_text("✅ Email cleared and email delivery disabled.")
+        elif "@" in email_input and "." in email_input:
+            user.email = email_input
+            update_user(user)
+            await update.message.reply_text(
+                f"✅ Email set to: {user.email}\n"
+                "Use `/email_digest on` to enable email delivery.",
+                parse_mode='Markdown'
+            )
+        else:
+            await update.message.reply_text("❌ Invalid email address. Check the format and try again.")
+    else:
+        current = user.email if user.email else "Not set"
+        await update.message.reply_text(
+            f"**Current email:** {current}\n\n"
+            "To set, use:\n"
+            "`/set_email user@example.com`\n"
+            "`/set_email off` to clear",
+            parse_mode='Markdown'
+        )
+
+
+async def email_digest_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Handle /email_digest on|off command."""
+    chat_id = update.effective_chat.id
+    user = get_user(chat_id)
+    
+    if not user:
+        await update.message.reply_text("Please use /start first.")
+        return
+    
+    text = update.message.text.lower()
+    if "on" in text:
+        if not user.email:
+            await update.message.reply_text(
+                "⚠️ No email address set. Use `/set_email user@example.com` first.",
+                parse_mode='Markdown'
+            )
+            return
+        if not is_email_configured():
+            await update.message.reply_text(
+                "⚠️ Email sending is not configured on the server (SMTP credentials missing). "
+                "Contact the bot admin."
+            )
+            return
+        user.email_digest_enabled = True
+        update_user(user)
+        await update.message.reply_text(f"✅ Email delivery enabled! Digests will be sent to {user.email}")
+    elif "off" in text:
+        user.email_digest_enabled = False
+        update_user(user)
+        await update.message.reply_text("❌ Email delivery disabled.")
+    else:
+        status = "enabled" if user.email_digest_enabled else "disabled"
+        await update.message.reply_text(
+            f"Email delivery is currently **{status}**.\n"
+            "Use `/email_digest on` or `/email_digest off` to change.",
             parse_mode='Markdown'
         )
 
@@ -559,10 +867,21 @@ async def digest_now_command(update: Update, context: ContextTypes.DEFAULT_TYPE)
             # Run in thread to avoid blocking
             response = await asyncio.to_thread(handler.process_message, query)
             
-            await update.message.reply_text(
-                f"📊 **{topic.upper()} Digest:**\n\n{response}",
-                parse_mode='Markdown'
-            )
+            full_text = f"📊 {topic.upper()} Digest:\n\n{response}"
+            
+            # Split long messages (Telegram limit = 4096 chars)
+            if len(full_text) > 4000:
+                for i in range(0, len(full_text), 4000):
+                    await update.message.reply_text(full_text[i:i+4000])
+            else:
+                await update.message.reply_text(full_text)
+            
+            # Send email copy if enabled
+            if user.email_digest_enabled and user.email:
+                try:
+                    send_daily_digest_email(user.email, topic, response)
+                except Exception as email_err:
+                    logger.error(f"Email send failed for {user.chat_id}: {email_err}")
     except Exception as e:
         logger.error(f"Error generating digest: {e}")
         await update.message.reply_text(f"❌ Error generating digest: {str(e)}")
@@ -621,10 +940,15 @@ async def send_daily_digests(context: ContextTypes.DEFAULT_TYPE) -> None:
     """Job to send daily digests to subscribed users."""
     from datetime import datetime
     
-    current_hour = datetime.now().hour
-    users = get_users_for_daily_digest(current_hour)
+    now = datetime.now()
+    current_hour = now.hour
+    current_minute = now.minute
+    users = get_users_for_daily_digest(current_hour, current_minute)
     
-    logger.info(f"Running daily digest job for hour {current_hour}, found {len(users)} users")
+    if not users:
+        return  # Skip logging when no users match (runs every minute)
+    
+    logger.info(f"Running daily digest job for {current_hour:02d}:{current_minute:02d}, found {len(users)} users")
     
     for user in users:
         try:
@@ -634,11 +958,21 @@ async def send_daily_digests(context: ContextTypes.DEFAULT_TYPE) -> None:
                 query = f"What are the most interesting things today in {topic}?"
                 response = handler.process_message(query)
                 
-                await context.bot.send_message(
-                    chat_id=user.chat_id,
-                    text=f"📅 **Daily {topic.upper()} Digest:**\n\n{response}",
-                    parse_mode='Markdown'
-                )
+                # Send to Telegram (no parse_mode — AI content can break Markdown)
+                full_text = f"📅 Daily {topic.upper()} Digest:\n\n{response}"
+                if len(full_text) > 4000:
+                    for i in range(0, len(full_text), 4000):
+                        await context.bot.send_message(chat_id=user.chat_id, text=full_text[i:i+4000])
+                else:
+                    await context.bot.send_message(chat_id=user.chat_id, text=full_text)
+                
+                # Send email copy if enabled
+                if user.email_digest_enabled and user.email:
+                    try:
+                        send_daily_digest_email(user.email, topic, response)
+                        logger.info(f"Daily email sent to {user.email} for topic {topic}")
+                    except Exception as email_err:
+                        logger.error(f"Daily email failed for {user.chat_id}: {email_err}")
         except Exception as e:
             logger.error(f"Error sending daily digest to {user.chat_id}: {e}")
 
@@ -647,11 +981,16 @@ async def send_weekly_digests(context: ContextTypes.DEFAULT_TYPE) -> None:
     """Job to send weekly digests to subscribed users."""
     from datetime import datetime
     
-    current_day = datetime.now().strftime("%A").lower()
-    current_hour = datetime.now().hour
-    users = get_users_for_weekly_digest(current_day, current_hour)
+    now = datetime.now()
+    current_day = now.strftime("%A").lower()
+    current_hour = now.hour
+    current_minute = now.minute
+    users = get_users_for_weekly_digest(current_day, current_hour, current_minute)
     
-    logger.info(f"Running weekly digest job for {current_day} hour {current_hour}, found {len(users)} users")
+    if not users:
+        return  # Skip logging when no users match
+    
+    logger.info(f"Running weekly digest job for {current_day} {current_hour:02d}:{current_minute:02d}, found {len(users)} users")
     
     for user in users:
         try:
@@ -661,11 +1000,21 @@ async def send_weekly_digests(context: ContextTypes.DEFAULT_TYPE) -> None:
                 query = f"What are the most interesting things this week in {topic}?"
                 response = handler.process_message(query)
                 
-                await context.bot.send_message(
-                    chat_id=user.chat_id,
-                    text=f"📆 **Weekly {topic.upper()} Digest:**\n\n{response}",
-                    parse_mode='Markdown'
-                )
+                # Send to Telegram (no parse_mode — AI content can break Markdown)
+                full_text = f"📆 Weekly {topic.upper()} Digest:\n\n{response}"
+                if len(full_text) > 4000:
+                    for i in range(0, len(full_text), 4000):
+                        await context.bot.send_message(chat_id=user.chat_id, text=full_text[i:i+4000])
+                else:
+                    await context.bot.send_message(chat_id=user.chat_id, text=full_text)
+                
+                # Send email copy if enabled
+                if user.email_digest_enabled and user.email:
+                    try:
+                        send_weekly_digest_email(user.email, topic, response)
+                        logger.info(f"Weekly email sent to {user.email} for topic {topic}")
+                    except Exception as email_err:
+                        logger.error(f"Weekly email failed for {user.chat_id}: {email_err}")
         except Exception as e:
             logger.error(f"Error sending weekly digest to {user.chat_id}: {e}")
 
@@ -674,11 +1023,33 @@ async def send_weekly_digests(context: ContextTypes.DEFAULT_TYPE) -> None:
 # Main Application Setup
 # =============================================================================
 
+async def post_init(application: Application) -> None:
+    """Register bot commands after initialization."""
+    from telegram import BotCommand
+    commands = [
+        BotCommand("start", "Begin setup or view settings"),
+        BotCommand("settings", "View & change preferences"),
+        BotCommand("digest", "Get a digest right now"),
+        BotCommand("set_frequency", "Set digest schedule"),
+        BotCommand("set_time", "Set digest time (HH:MM)"),
+        BotCommand("set_topics", "Change topics of interest"),
+        BotCommand("set_subreddits", "Change followed subreddits"),
+        BotCommand("set_email", "Set email address"),
+        BotCommand("email_digest", "Toggle email delivery on/off"),
+        BotCommand("weekly", "Toggle weekly digest on/off"),
+        BotCommand("topics", "List available topics"),
+        BotCommand("help", "Show all commands"),
+        BotCommand("reset", "Clear all preferences"),
+    ]
+    await application.bot.set_my_commands(commands)
+    logger.info("Bot commands registered with Telegram")
+
+
 def create_application() -> Application:
     """Create and configure the Telegram bot application."""
     
-    # Build application
-    application = Application.builder().token(TELEGRAM_BOT_TOKEN).build()
+    # Build application with post_init hook for command registration
+    application = Application.builder().token(TELEGRAM_BOT_TOKEN).post_init(post_init).build()
     
     # Onboarding conversation handler
     onboarding_handler = TGConversationHandler(
@@ -704,17 +1075,21 @@ def create_application() -> Application:
     application.add_handler(CommandHandler("set_subreddits", set_subreddits_command))
     application.add_handler(CommandHandler("set_topics", set_topics_command))
     application.add_handler(CommandHandler("set_frequency", set_frequency_command))
+    application.add_handler(CommandHandler("set_time", set_time_command))
+    application.add_handler(CommandHandler("set_email", set_email_command))
+    application.add_handler(CommandHandler("email_digest", email_digest_command))
     application.add_handler(CommandHandler("digest", digest_now_command))
+    
+    # Inline keyboard callback handler for settings panel
+    application.add_handler(CallbackQueryHandler(settings_callback_handler))
     
     # Message handler for natural chat (must be last)
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
     
-    # Schedule jobs for digests
+    # Schedule jobs for digests - runs every 60s for exact HH:MM matching
     job_queue = application.job_queue
-    
-    # Run digest checks every hour
-    job_queue.run_repeating(send_daily_digests, interval=3600, first=60)  # Every hour
-    job_queue.run_repeating(send_weekly_digests, interval=3600, first=120)  # Every hour, offset
+    job_queue.run_repeating(send_daily_digests, interval=60, first=10)
+    job_queue.run_repeating(send_weekly_digests, interval=60, first=30)
     
     return application
 

@@ -31,38 +31,11 @@ TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 # =============================================================================
 # Topic to Subreddit Mapping
 # =============================================================================
-TOPIC_SUBREDDIT_MAP = {
-    # Technology & AI
-    "tech": ["technology", "gadgets", "hardware", "software", "TechNewsToday"],
-    "ai": ["MachineLearning", "artificial", "OpenAI", "LocalLLaMA", "ChatGPT", "deeplearning"],
-    "programming": ["programming", "learnprogramming", "webdev", "Python", "javascript", "coding"],
-    
-    # Sports
-    "sports": ["sports", "nba", "soccer", "nfl", "baseball", "hockey"],
-    "football": ["soccer", "football", "PremierLeague", "LaLiga", "Bundesliga"],
-    "basketball": ["nba", "basketball", "NBAdiscussion"],
-    
-    # Politics
-    "politics": ["politics", "worldnews", "news", "PoliticalDiscussion", "geopolitics"],
-    "uspolitics": ["politics", "Conservative", "democrats", "Republican"],
-    "worldpolitics": ["worldnews", "geopolitics", "europe", "worldpolitics"],
-    
-    # Gaming
-    "gaming": ["gaming", "Games", "pcgaming", "PS5", "XboxSeriesX", "NintendoSwitch"],
-    
-    # Crypto & Finance
-    "crypto": ["CryptoCurrency", "Bitcoin", "ethereum", "CryptoMarkets"],
-    "finance": ["finance", "stocks", "investing", "wallstreetbets"],
-    
-    # Science
-    "science": ["science", "Physics", "biology", "chemistry", "space"],
-    
-    # General News
-    "news": ["news", "worldnews", "UpliftingNews", "nottheonion"],
-}
+# Topic → Subreddit mapping (loaded from external registry)
+from .registry import TOPIC_SUBREDDIT_MAP
 
 # Legacy compatibility
-AI_SUBREDDITS = TOPIC_SUBREDDIT_MAP["ai"]
+AI_SUBREDDITS = TOPIC_SUBREDDIT_MAP.get("ai", [])
 
 
 #Summary configuration

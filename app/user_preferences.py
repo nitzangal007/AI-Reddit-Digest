@@ -20,7 +20,7 @@ class UserPreferences:
     language: str = "en"  # English only
     
     # Content preferences
-    favorite_topics: list[str] = field(default_factory=lambda: ["tech", "ai"])
+    favorite_topics: list[str] = field(default_factory=lambda: ["tech"])
     favorite_subreddits: list[str] = field(default_factory=list)
     
     # Fetch preferences
@@ -31,7 +31,7 @@ class UserPreferences:
     # Automation preferences
     weekly_digest_enabled: bool = True
     weekly_digest_day: str = "Sunday"  # Day of week for weekly digest
-    weekly_digest_topics: list[str] = field(default_factory=lambda: ["tech", "ai"])
+    weekly_digest_topics: list[str] = field(default_factory=lambda: ["tech"])
     
     # Cache preferences (for cost reduction)
     cache_enabled: bool = True

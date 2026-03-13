@@ -1,0 +1,4407 @@
+{
+  "topics": {
+    "ai": {
+      "keywords": [
+        "\\bai\\b",
+        "artificial intelligence",
+        "machine learning",
+        "\\bml\\b",
+        "\\bllm\\b",
+        "deep learning",
+        "neural network",
+        "transformer",
+        "natural language",
+        "computer vision",
+        "generative ai",
+        "gen ai"
+      ],
+      "entities": [
+        "\\bgpt[-\\s]?[234o]?\\b",
+        "chatgpt",
+        "openai",
+        "\\bclaude\\b",
+        "anthropic",
+        "\\bgemini\\b",
+        "\\bllama\\b",
+        "meta ai",
+        "\\bmistral\\b",
+        "\\bcohere\\b",
+        "stable diffusion",
+        "midjourney",
+        "dall[-\\s]?e",
+        "\\bsora\\b",
+        "copilot",
+        "hugging\\s?face",
+        "\\bgrok\\b",
+        "perplexity",
+        "finetuning",
+        "fine[-\\s]?tuning",
+        "prompt engineering",
+        "rag\\b",
+        "vector database",
+        "embedding",
+        "inference",
+        "training run",
+        "rlhf",
+        "alignment",
+        "hallucination",
+        "context window"
+      ],
+      "default_subreddits": [
+        "MachineLearning",
+        "artificial",
+        "OpenAI",
+        "LocalLLaMA",
+        "ChatGPT",
+        "deeplearning"
+      ]
+    },
+    "tech": {
+      "keywords": [
+        "\\btech\\b",
+        "technology",
+        "gadgets?",
+        "hardware",
+        "software",
+        "smartphone",
+        "laptop",
+        "computer",
+        "device",
+        "chip"
+      ],
+      "entities": [
+        "\\bapple\\b",
+        "\\bgoogle\\b",
+        "\\bmicrosoft\\b",
+        "\\bamazon\\b",
+        "\\bmeta\\b",
+        "\\bnvidia\\b",
+        "\\bintel\\b",
+        "\\bamd\\b",
+        "\\bqualcomm\\b",
+        "\\bsamsumg\\b",
+        "\\btsmc\\b",
+        "\\bdell\\b",
+        "\\bhp\\b",
+        "\\blenovo\\b",
+        "\\basus\\b",
+        "iphone",
+        "ipad",
+        "macbook",
+        "imac",
+        "airpods",
+        "apple watch",
+        "pixel",
+        "android",
+        "windows",
+        "linux",
+        "macos",
+        "ios",
+        "\\bcpu\\b",
+        "\\bgpu\\b",
+        "graphics card",
+        "processor",
+        "m[1234] chip",
+        "rtx",
+        "geforce",
+        "radeon",
+        "ryzen",
+        "threadripper",
+        "usb[-\\s]?c",
+        "thunderbolt",
+        "wifi",
+        "5g",
+        "starlink"
+      ],
+      "default_subreddits": [
+        "technology",
+        "gadgets",
+        "hardware",
+        "software",
+        "TechNewsToday"
+      ]
+    },
+    "programming": {
+      "keywords": [
+        "programming",
+        "\\bcode\\b",
+        "\\bcoding\\b",
+        "developer",
+        "software dev",
+        "web dev",
+        "backend",
+        "frontend",
+        "full[-\\s]?stack",
+        "\\bapi\\b",
+        "\\bbug\\b",
+        "debug",
+        "deploy",
+        "devops",
+        "ci/cd"
+      ],
+      "entities": [
+        "\\bpython\\b",
+        "\\bjavascript\\b",
+        "\\btypescript\\b",
+        "\\bjava\\b",
+        "\\bc\\+\\+\\b",
+        "\\bc#\\b",
+        "\\brust\\b",
+        "\\bgo\\b",
+        "\\bkotlin\\b",
+        "\\bswift\\b",
+        "\\bruby\\b",
+        "\\bphp\\b",
+        "\\bscala\\b",
+        "\\bzig\\b",
+        "\\breact\\b",
+        "\\bvue\\b",
+        "\\bangular\\b",
+        "\\bsvelte\\b",
+        "\\bnext\\.?js\\b",
+        "\\bnode\\.?js\\b",
+        "\\bdjango\\b",
+        "\\bflask\\b",
+        "\\bfastapi\\b",
+        "\\bspring\\b",
+        "\\brails\\b",
+        "\\blasravel\\b",
+        "\\bdocker\\b",
+        "\\bkubernetes\\b",
+        "\\bgit\\b",
+        "\\bgithub\\b",
+        "\\bgitlab\\b",
+        "stack\\s?overflow",
+        "\\bnpm\\b",
+        "\\bpip\\b",
+        "\\bcargo\\b",
+        "\\baws\\b",
+        "\\bazure\\b",
+        "\\bgcp\\b",
+        "cloud"
+      ],
+      "default_subreddits": [
+        "programming",
+        "learnprogramming",
+        "webdev",
+        "Python",
+        "javascript",
+        "coding"
+      ]
+    },
+    "sports": {
+      "keywords": [
+        "\\bsports?\\b",
+        "\\bfootball\\b",
+        "\\bsoccer\\b",
+        "\\bbasketball\\b",
+        "\\btennis\\b",
+        "\\bgolf\\b",
+        "\\bbaseball\\b",
+        "\\bhockey\\b",
+        "\\brugby\\b",
+        "\\bcricket\\b",
+        "\\bf1\\b",
+        "formula\\s?1",
+        "\\bmma\\b",
+        "\\bufc\\b",
+        "\\bboxing\\b",
+        "\\bolympics\\b",
+        "world cup"
+      ],
+      "entities": [
+        "\\bnba\\b",
+        "\\bnfl\\b",
+        "\\bmlb\\b",
+        "\\bnhl\\b",
+        "\\bmls\\b",
+        "premier league",
+        "\\bucl\\b",
+        "champions league",
+        "\\bla liga\\b",
+        "\\bbundesliga\\b",
+        "\\bserie a\\b",
+        "\\bligue 1\\b",
+        "\\beuro\\b",
+        "super bowl",
+        "world series",
+        "stanley cup",
+        "march madness",
+        "lakers",
+        "celtics",
+        "warriors",
+        "bulls",
+        "heat",
+        "manchester (united|city)",
+        "\\breal madrid\\b",
+        "\\bbarcelona\\b",
+        "\\bliverpool\\b",
+        "\\bchelsea\\b",
+        "\\barsenal\\b",
+        "\\btottenham\\b",
+        "\\bjuventus\\b",
+        "\\bbayern\\b",
+        "\\bpsg\\b",
+        "\\bdortmund\\b",
+        "cowboys",
+        "patriots",
+        "chiefs",
+        "49ers",
+        "packers",
+        "yankees",
+        "dodgers",
+        "red sox",
+        "\\bmessi\\b",
+        "\\bronaldo\\b",
+        "\\bneymar\\b",
+        "\\bmbappe\\b",
+        "\\blebron\\b",
+        "\\bcurry\\b",
+        "\\bdurant\\b",
+        "\\bgiannis\\b",
+        "\\bmahomes\\b",
+        "\\bbrady\\b",
+        "\\bohtani\\b",
+        "\\bjudge\\b"
+      ],
+      "default_subreddits": [
+        "sports",
+        "nba",
+        "soccer",
+        "nfl",
+        "baseball",
+        "hockey"
+      ]
+    },
+    "politics": {
+      "keywords": [
+        "politic",
+        "government",
+        "election",
+        "vote",
+        "voting",
+        "democrat",
+        "republican",
+        "congress",
+        "parliament",
+        "legislation",
+        "law",
+        "policy",
+        "foreign affairs"
+      ],
+      "entities": [
+        "\\btrump\\b",
+        "\\bbiden\\b",
+        "\\bharris\\b",
+        "\\bobama\\b",
+        "white house",
+        "\\bsenate\\b",
+        "house of rep",
+        "\\bgop\\b",
+        "supreme court",
+        "\\bscotus\\b",
+        "mid[-\\s]?terms?",
+        "\\bputin\\b",
+        "\\bzelensky\\b",
+        "\\bmacron\\b",
+        "\\bscholz\\b",
+        "\\bsunak\\b",
+        "\\bstarmer\\b",
+        "\\bnetanyahu\\b",
+        "\\bxi\\b",
+        "\\bun\\b",
+        "\\bnato\\b",
+        "\\beu\\b",
+        "european union",
+        "abortion",
+        "immigration",
+        "gun control",
+        "climate",
+        "healthcare",
+        "tax",
+        "tariff",
+        "sanction",
+        "impeach",
+        "left[-\\s]?wing",
+        "right[-\\s]?wing",
+        "progressive",
+        "conservative"
+      ],
+      "default_subreddits": [
+        "politics",
+        "worldnews",
+        "news",
+        "PoliticalDiscussion",
+        "geopolitics"
+      ]
+    },
+    "gaming": {
+      "keywords": [
+        "\\bgaming\\b",
+        "video\\s?game",
+        "\\bgamers?\\b",
+        "\\besports?\\b",
+        "play\\s?through",
+        "speedrun",
+        "mod(ding)?",
+        "dlc"
+      ],
+      "entities": [
+        "\\bps5\\b",
+        "playstation",
+        "\\bxbox\\b",
+        "\\bswitch\\b",
+        "\\bpc gaming\\b",
+        "\\bsteam\\b",
+        "\\bepic games\\b",
+        "game pass",
+        "\\bnintendo\\b",
+        "\\bsony\\b",
+        "\\bvr\\b",
+        "oculus",
+        "quest",
+        "steam deck",
+        "\\bea\\b",
+        "electronic arts",
+        "\\bubisoft\\b",
+        "\\bactivision\\b",
+        "\\bblizzard\\b",
+        "\\bbethesda\\b",
+        "\\brockstar\\b",
+        "\\bnaughty dog\\b",
+        "\\bfromsoft",
+        "\\bnintendo\\b",
+        "\\bvalve\\b",
+        "\\briot\\b",
+        "baldur'?s gate",
+        "elden ring",
+        "cyberpunk",
+        "starfield",
+        "gta",
+        "call of duty",
+        "\\bcod\\b",
+        "fortnite",
+        "minecraft",
+        "zelda",
+        "tears of the kingdom",
+        "totk",
+        "botw",
+        "final fantasy",
+        "ffxiv",
+        "ffxvi",
+        "diablo",
+        "world of warcraft",
+        "\\bwow\\b",
+        "overwatch",
+        "valorant",
+        "league of legends",
+        "\\blol\\b",
+        "counter[-\\s]?strike",
+        "\\bcs2\\b",
+        "\\bcsgo\\b",
+        "apex legends",
+        "hogwarts legacy",
+        "spider[-\\s]?man",
+        "god of war",
+        "\\bhalo\\b",
+        "game awards",
+        "goty",
+        "game of the year"
+      ],
+      "default_subreddits": [
+        "gaming",
+        "Games",
+        "pcgaming",
+        "PS5",
+        "XboxSeriesX",
+        "NintendoSwitch"
+      ]
+    },
+    "crypto": {
+      "keywords": [
+        "\\bcrypto\\b",
+        "cryptocurrency",
+        "blockchain",
+        "decentralized",
+        "\\bdefi\\b",
+        "\\bnft\\b",
+        "web3",
+        "token",
+        "mining",
+        "\\bhodl\\b",
+        "bull run",
+        "bear market"
+      ],
+      "entities": [
+        "\\bbitcoin\\b",
+        "\\bbtc\\b",
+        "\\bethereum\\b",
+        "\\beth\\b",
+        "\\bsolana\\b",
+        "\\bsol\\b",
+        "\\bcardano\\b",
+        "\\bada\\b",
+        "\\bxrp\\b",
+        "\\bripple\\b",
+        "\\bdoge\\b",
+        "dogecoin",
+        "\\bbnb\\b",
+        "\\bmatic\\b",
+        "\\bpolygon\\b",
+        "\\bavax\\b",
+        "\\blink\\b",
+        "chainlink",
+        "\\bshib\\b",
+        "pepe",
+        "\\busdt\\b",
+        "\\busdc\\b",
+        "stablecoin",
+        "altcoin",
+        "\\bcoinbase\\b",
+        "\\bbinance\\b",
+        "\\bkraken\\b",
+        "\\bftx\\b",
+        "\\buniswap\\b",
+        "\\bopensea\\b",
+        "metamask",
+        "ledger",
+        "smart contract",
+        "layer 2",
+        "\\bl2\\b",
+        "rollup",
+        "\\bsec\\b",
+        "\\bgensler\\b",
+        "spot etf",
+        "bitcoin etf"
+      ],
+      "default_subreddits": [
+        "CryptoCurrency",
+        "Bitcoin",
+        "ethereum",
+        "CryptoMarkets"
+      ]
+    },
+    "science": {
+      "keywords": [
+        "\\bscience\\b",
+        "scientific",
+        "research",
+        "study",
+        "discovery",
+        "experiment",
+        "theory",
+        "hypothesis"
+      ],
+      "entities": [
+        "\\bphysics\\b",
+        "\\bchemistry\\b",
+        "\\bbiology\\b",
+        "\\bastronomy\\b",
+        "\\bgenetics\\b",
+        "\\bneuroscience\\b",
+        "\\bclimate\\b",
+        "quantum",
+        "\\bnasa\\b",
+        "\\besa\\b",
+        "\\bcern\\b",
+        "\\bspacex\\b",
+        "blue origin",
+        "\\bnoaa\\b",
+        "\\bnih\\b",
+        "\\bwho\\b",
+        "james webb",
+        "\\bjwst\\b",
+        "\\bhubble\\b",
+        "black hole",
+        "exoplanet",
+        "mars",
+        "moon",
+        "asteroid",
+        "climate change",
+        "global warming",
+        "fusion",
+        "fission",
+        "vaccine",
+        "virus",
+        "\\bcrispr\\b",
+        "gene editing",
+        "dark matter",
+        "dark energy",
+        "higgs",
+        "particle"
+      ],
+      "default_subreddits": [
+        "science",
+        "Physics",
+        "biology",
+        "chemistry",
+        "space"
+      ]
+    },
+    "football": {
+      "keywords": [],
+      "entities": [],
+      "default_subreddits": [
+        "soccer",
+        "football",
+        "PremierLeague",
+        "LaLiga",
+        "Bundesliga"
+      ]
+    },
+    "basketball": {
+      "keywords": [],
+      "entities": [],
+      "default_subreddits": [
+        "nba",
+        "basketball",
+        "NBAdiscussion"
+      ]
+    },
+    "uspolitics": {
+      "keywords": [],
+      "entities": [],
+      "default_subreddits": [
+        "politics",
+        "Conservative",
+        "democrats",
+        "Republican"
+      ]
+    },
+    "worldpolitics": {
+      "keywords": [],
+      "entities": [],
+      "default_subreddits": [
+        "worldnews",
+        "geopolitics",
+        "europe",
+        "worldpolitics"
+      ]
+    },
+    "finance": {
+      "keywords": [],
+      "entities": [],
+      "default_subreddits": [
+        "finance",
+        "stocks",
+        "investing",
+        "wallstreetbets"
+      ]
+    },
+    "news": {
+      "keywords": [],
+      "entities": [],
+      "default_subreddits": [
+        "news",
+        "worldnews",
+        "UpliftingNews",
+        "nottheonion"
+      ]
+    }
+  },
+  "entity_subreddit_overrides": {
+    "3d modeling": [
+      "3Dmodeling",
+      "blender"
+    ],
+    "3d printing": [
+      "3Dprinting",
+      "FixMyPrint"
+    ],
+    "401k": [
+      "personalfinance",
+      "Bogleheads"
+    ],
+    "adguard home": [
+      "Adguard",
+      "selfhosted",
+      "HomeNetworking"
+    ],
+    "adobe premiere pro": [
+      "premiere",
+      "VideoEditing"
+    ],
+    "aeropress": [
+      "Coffee"
+    ],
+    "after effects": [
+      "AfterEffects",
+      "VideoEditing"
+    ],
+    "ai career": [
+      "MachineLearning",
+      "cscareerquestions"
+    ],
+    "aider": [
+      "ChatGPTCoding",
+      "LocalLLaMA",
+      "OpenAI"
+    ],
+    "air fryer": [
+      "airfryer",
+      "Cooking"
+    ],
+    "airdrop": [
+      "CryptoCurrency",
+      "ethfinance"
+    ],
+    "albion online": [
+      "albiononline"
+    ],
+    "alignment": [
+      "MachineLearning",
+      "artificial",
+      "ControlProblem"
+    ],
+    "alt season": [
+      "CryptoCurrency"
+    ],
+    "amd": [
+      "Amd",
+      "hardware",
+      "buildapc"
+    ],
+    "amd gpus": [
+      "Amd",
+      "buildapc",
+      "pcmasterrace"
+    ],
+    "amd ryzen": [
+      "Amd",
+      "buildapc",
+      "hardware"
+    ],
+    "amps": [
+      "audiophile",
+      "headphones"
+    ],
+    "anbernic": [
+      "ANBERNIC",
+      "SBCGaming"
+    ],
+    "andor": [
+      "StarWars",
+      "starwarsspeculation"
+    ],
+    "android": [
+      "Android",
+      "androiddev",
+      "GooglePixel",
+      "samsung"
+    ],
+    "angular": [
+      "Angular",
+      "webdev",
+      "javascript"
+    ],
+    "anime": [
+      "anime"
+    ],
+    "anno": [
+      "anno"
+    ],
+    "ansible": [
+      "ansible",
+      "devops",
+      "sysadmin"
+    ],
+    "ansible automation": [
+      "ansible",
+      "devops"
+    ],
+    "anthropic": [
+      "ClaudeAI",
+      "artificial",
+      "MachineLearning",
+      "Anthropic",
+      "singularity",
+      "OpenAI"
+    ],
+    "apex legends": [
+      "apexlegends",
+      "gaming",
+      "CompetitiveApex"
+    ],
+    "apple tv": [
+      "television",
+      "SeveranceAppleTVPlus"
+    ],
+    "apple watch": [
+      "AppleWatch",
+      "apple"
+    ],
+    "aptos": [
+      "CryptoCurrency"
+    ],
+    "arbitrum": [
+      "arbitrum",
+      "ethfinance",
+      "CryptoCurrency"
+    ],
+    "arc b580": [
+      "IntelArc",
+      "buildapc",
+      "hardware"
+    ],
+    "arc battlemage": [
+      "IntelArc",
+      "buildapc",
+      "hardware"
+    ],
+    "arch linux": [
+      "archlinux",
+      "linux"
+    ],
+    "argo cd": [
+      "kubernetes",
+      "devops"
+    ],
+    "argocd": [
+      "kubernetes",
+      "devops"
+    ],
+    "arknights": [
+      "arknights"
+    ],
+    "arsenal": [
+      "Gunners",
+      "soccer",
+      "PremierLeague"
+    ],
+    "arxiv": [
+      "MachineLearning",
+      "deeplearning",
+      "artificial"
+    ],
+    "asset allocation": [
+      "Bogleheads",
+      "investing",
+      "personalfinance"
+    ],
+    "aston villa": [
+      "avfc",
+      "PremierLeague",
+      "soccer"
+    ],
+    "attack on titan": [
+      "ShingekiNoKyojin"
+    ],
+    "audiobookshelf": [
+      "audiobookshelf",
+      "selfhosted"
+    ],
+    "audiophile": [
+      "audiophile",
+      "headphones",
+      "HeadphoneAdvice"
+    ],
+    "automatic1111": [
+      "StableDiffusion",
+      "comfyui"
+    ],
+    "avalanche": [
+      "Avax",
+      "CryptoCurrency"
+    ],
+    "awards season": [
+      "oscarrace",
+      "movies"
+    ],
+    "aws": [
+      "aws",
+      "devops",
+      "sysadmin"
+    ],
+    "ayn odin": [
+      "OdinHandheld",
+      "SBCGaming"
+    ],
+    "azure": [
+      "AZURE",
+      "devops",
+      "sysadmin",
+      "Azure"
+    ],
+    "azure openai": [
+      "OpenAI",
+      "LocalLLaMA",
+      "singularity"
+    ],
+    "b650 motherboard": [
+      "buildapc",
+      "Amd",
+      "hardware"
+    ],
+    "balatro": [
+      "balatro"
+    ],
+    "baldur's gate": [
+      "BaldursGate3",
+      "gaming",
+      "rpg_gamers"
+    ],
+    "bambu lab": [
+      "BambuLab",
+      "3Dprinting"
+    ],
+    "barcelona": [
+      "Barca",
+      "soccer",
+      "LaLiga"
+    ],
+    "base chain": [
+      "ethfinance",
+      "CryptoCurrency"
+    ],
+    "baseball": [
+      "baseball",
+      "mlb"
+    ],
+    "basketball": [
+      "nba",
+      "basketball",
+      "NBAdiscussion"
+    ],
+    "battlestations": [
+      "battlestations",
+      "pcmasterrace"
+    ],
+    "bayern": [
+      "fcbayern",
+      "soccer",
+      "Bundesliga"
+    ],
+    "bbq": [
+      "BBQ",
+      "Cooking"
+    ],
+    "bear market": [
+      "CryptoCurrency",
+      "investing"
+    ],
+    "better call saul": [
+      "betterCallSaul",
+      "television"
+    ],
+    "biden": [
+      "politics",
+      "democrats",
+      "news"
+    ],
+    "binding of isaac": [
+      "bindingofisaac"
+    ],
+    "bitcoin": [
+      "Bitcoin",
+      "CryptoCurrency",
+      "btc"
+    ],
+    "bitwarden": [
+      "Bitwarden",
+      "privacy",
+      "selfhosted"
+    ],
+    "bitwarden self hosted": [
+      "selfhosted",
+      "vaultwarden"
+    ],
+    "black desert online": [
+      "blackdesertonline"
+    ],
+    "blank gameweek": [
+      "FantasyPL",
+      "PremierLeague"
+    ],
+    "bleach": [
+      "bleach"
+    ],
+    "blender": [
+      "blender",
+      "3Dmodeling"
+    ],
+    "blue archive": [
+      "BlueArchive"
+    ],
+    "board games": [
+      "boardgames"
+    ],
+    "bodybuilding": [
+      "bodybuilding",
+      "moreplatesmoredates"
+    ],
+    "bogleheads": [
+      "Bogleheads",
+      "investing"
+    ],
+    "bolt new": [
+      "ChatGPTCoding",
+      "OpenAI"
+    ],
+    "boxing": [
+      "Boxing"
+    ],
+    "brawlhalla": [
+      "Brawlhalla"
+    ],
+    "bread baking": [
+      "Breadit",
+      "Cooking"
+    ],
+    "breaking bad": [
+      "breakingbad",
+      "television"
+    ],
+    "brighton": [
+      "BrightonHoveAlbion",
+      "PremierLeague",
+      "soccer"
+    ],
+    "brokerage account": [
+      "personalfinance",
+      "investing"
+    ],
+    "btc": [
+      "Bitcoin",
+      "CryptoCurrency"
+    ],
+    "budgeting": [
+      "personalfinance",
+      "budget"
+    ],
+    "build a pc": [
+      "buildapc",
+      "hardware",
+      "pcmasterrace"
+    ],
+    "buildapc": [
+      "buildapc",
+      "pcmasterrace",
+      "hardware"
+    ],
+    "bulking": [
+      "bodybuilding",
+      "fitness"
+    ],
+    "bull run": [
+      "CryptoCurrency",
+      "Bitcoin"
+    ],
+    "bundesliga": [
+      "Bundesliga",
+      "soccer",
+      "fcbayern"
+    ],
+    "burr grinder": [
+      "Coffee",
+      "espresso"
+    ],
+    "byd": [
+      "electricvehicles"
+    ],
+    "c#": [
+      "csharp",
+      "dotnet",
+      "programming"
+    ],
+    "c++": [
+      "cpp",
+      "programming",
+      "learnprogramming"
+    ],
+    "caddy": [
+      "Caddy",
+      "selfhosted",
+      "sysadmin"
+    ],
+    "calisthenics": [
+      "bodyweightfitness",
+      "calisthenics"
+    ],
+    "call of duty": [
+      "CallOfDuty",
+      "CODWarzone",
+      "gaming"
+    ],
+    "captaincy": [
+      "FantasyPL"
+    ],
+    "car detailing": [
+      "AutoDetailing"
+    ],
+    "cardano": [
+      "cardano",
+      "CryptoCurrency"
+    ],
+    "career advice": [
+      "careeradvice",
+      "jobs"
+    ],
+    "cars": [
+      "cars",
+      "whatcarshouldIbuy"
+    ],
+    "cash secured puts": [
+      "options",
+      "stocks"
+    ],
+    "cast iron": [
+      "castiron",
+      "Cooking"
+    ],
+    "celtics": [
+      "bostonceltics",
+      "nba"
+    ],
+    "cerebras": [
+      "singularity",
+      "LocalLLaMA"
+    ],
+    "cert manager": [
+      "kubernetes",
+      "devops"
+    ],
+    "chainsaw man": [
+      "ChainsawMan"
+    ],
+    "champions league": [
+      "ChampionsLeague",
+      "soccer",
+      "football"
+    ],
+    "champions tour": [
+      "ValorantCompetitive",
+      "VALORANT"
+    ],
+    "chatgpt": [
+      "ChatGPT",
+      "OpenAI",
+      "LocalLLaMA",
+      "MachineLearning",
+      "singularity"
+    ],
+    "cheap meals": [
+      "EatCheapAndHealthy",
+      "Cooking"
+    ],
+    "chelsea": [
+      "chelseafc",
+      "soccer",
+      "PremierLeague"
+    ],
+    "ci cd": [
+      "devops",
+      "programming"
+    ],
+    "cicd": [
+      "devops",
+      "programming"
+    ],
+    "cities skylines": [
+      "CitiesSkylines"
+    ],
+    "civilization 6": [
+      "civ",
+      "Civilization6"
+    ],
+    "classic wow": [
+      "classicwow",
+      "wow"
+    ],
+    "claude": [
+      "ClaudeAI",
+      "artificial",
+      "MachineLearning",
+      "Anthropic",
+      "OpenAI",
+      "singularity"
+    ],
+    "claude code": [
+      "Anthropic",
+      "ChatGPTCoding",
+      "OpenAI"
+    ],
+    "cline": [
+      "ChatGPTCoding",
+      "LocalLLaMA",
+      "OpenAI"
+    ],
+    "cloudflare": [
+      "CloudFlare",
+      "sysadmin"
+    ],
+    "cod": [
+      "CallOfDuty",
+      "CODWarzone",
+      "gaming"
+    ],
+    "codegen": [
+      "ChatGPTCoding",
+      "LocalLLaMA",
+      "OpenAI"
+    ],
+    "coding assistant": [
+      "ChatGPTCoding",
+      "OpenAI",
+      "LocalLLaMA"
+    ],
+    "coffee": [
+      "Coffee"
+    ],
+    "coffee gear": [
+      "Coffee",
+      "espresso"
+    ],
+    "college": [
+      "college",
+      "ApplyingToCollege"
+    ],
+    "comfyui": [
+      "comfyui",
+      "StableDiffusion"
+    ],
+    "comic books": [
+      "comicbooks",
+      "Marvel"
+    ],
+    "commander": [
+      "EDH",
+      "magicTCG"
+    ],
+    "containerization": [
+      "docker",
+      "kubernetes",
+      "devops"
+    ],
+    "content creation": [
+      "NewTubers",
+      "VideoEditing",
+      "youtube"
+    ],
+    "context window": [
+      "LocalLLaMA",
+      "ChatGPT",
+      "MachineLearning"
+    ],
+    "continue dev": [
+      "ChatGPTCoding",
+      "LocalLLaMA"
+    ],
+    "cooking": [
+      "Cooking",
+      "recipes"
+    ],
+    "copilot": [
+      "MachineLearning",
+      "programming",
+      "ChatGPT",
+      "github",
+      "ChatGPTCoding"
+    ],
+    "counter strike 2": [
+      "GlobalOffensive",
+      "cs2"
+    ],
+    "counter-strike": [
+      "GlobalOffensive",
+      "csgo",
+      "pcgaming"
+    ],
+    "covered calls": [
+      "options",
+      "stocks"
+    ],
+    "cpp": [
+      "cpp",
+      "programming",
+      "learnprogramming"
+    ],
+    "credit cards": [
+      "CreditCards",
+      "personalfinance"
+    ],
+    "credit debt": [
+      "personalfinance",
+      "CRedit"
+    ],
+    "credit score": [
+      "CRedit",
+      "personalfinance"
+    ],
+    "cricket": [
+      "Cricket"
+    ],
+    "crusader kings 3": [
+      "CrusaderKings",
+      "paradoxplaza"
+    ],
+    "crypto": [
+      "CryptoCurrency",
+      "Bitcoin",
+      "ethereum"
+    ],
+    "cryptocurrency": [
+      "CryptoCurrency",
+      "Bitcoin",
+      "ethereum"
+    ],
+    "cs career": [
+      "cscareerquestions",
+      "careeradvice"
+    ],
+    "cs2": [
+      "GlobalOffensive",
+      "csgo",
+      "pcgaming",
+      "cs2"
+    ],
+    "csgo": [
+      "GlobalOffensive",
+      "csgo",
+      "pcgaming"
+    ],
+    "csharp": [
+      "csharp",
+      "dotnet",
+      "programming"
+    ],
+    "curry": [
+      "nba",
+      "warriors"
+    ],
+    "cursor": [
+      "ChatGPTCoding",
+      "OpenAI",
+      "LocalLLaMA"
+    ],
+    "custom keyboards": [
+      "CustomKeyboards",
+      "MechanicalKeyboards",
+      "BudgetKeebs"
+    ],
+    "cutting": [
+      "bodybuilding",
+      "fitness"
+    ],
+    "cybersecurity": [
+      "cybersecurity",
+      "netsec",
+      "AskNetsec"
+    ],
+    "dacs": [
+      "audiophile",
+      "headphones"
+    ],
+    "dall-e": [
+      "dalle",
+      "OpenAI",
+      "artificial"
+    ],
+    "data science career": [
+      "datascience",
+      "careeradvice"
+    ],
+    "davinci resolve": [
+      "davinciresolve",
+      "VideoEditing"
+    ],
+    "day trading": [
+      "Daytrading",
+      "stocks",
+      "wallstreetbets"
+    ],
+    "dc": [
+      "DCcomics",
+      "DC_Cinematic"
+    ],
+    "dead by daylight": [
+      "deadbydaylight"
+    ],
+    "debian": [
+      "debian",
+      "linux"
+    ],
+    "decentralized finance": [
+      "defi",
+      "ethfinance",
+      "CryptoCurrency"
+    ],
+    "deep learning": [
+      "deeplearning",
+      "MachineLearning",
+      "artificial"
+    ],
+    "deep rock galactic": [
+      "DeepRockGalactic"
+    ],
+    "deepseek": [
+      "LocalLLaMA",
+      "MachineLearning",
+      "artificial",
+      "OpenAI",
+      "singularity"
+    ],
+    "deepseek coder": [
+      "LocalLLaMA",
+      "ChatGPTCoding",
+      "OpenAI"
+    ],
+    "deepseek r1": [
+      "LocalLLaMA",
+      "OpenAI",
+      "singularity"
+    ],
+    "defi": [
+      "defi",
+      "CryptoCurrency",
+      "ethereum",
+      "ethfinance"
+    ],
+    "demon slayer": [
+      "KimetsuNoYaiba"
+    ],
+    "destiny": [
+      "DestinyTheGame",
+      "destiny2",
+      "gaming"
+    ],
+    "devops": [
+      "devops",
+      "sysadmin"
+    ],
+    "diablo": [
+      "Diablo",
+      "diablo4",
+      "gaming"
+    ],
+    "diffusion models": [
+      "StableDiffusion",
+      "comfyui"
+    ],
+    "disney plus": [
+      "television",
+      "marvelstudios"
+    ],
+    "dividend investing": [
+      "dividends",
+      "investing"
+    ],
+    "django": [
+      "django",
+      "Python",
+      "webdev"
+    ],
+    "dlss": [
+      "nvidia",
+      "pcmasterrace",
+      "hardware"
+    ],
+    "dnd": [
+      "DnD",
+      "dndnext"
+    ],
+    "dns sinkhole": [
+      "pihole",
+      "Adguard",
+      "HomeNetworking"
+    ],
+    "docker": [
+      "docker",
+      "devops",
+      "sysadmin",
+      "selfhosted"
+    ],
+    "docker compose": [
+      "docker",
+      "selfhosted",
+      "devops"
+    ],
+    "dota 2": [
+      "DotA2",
+      "TrueDoTA2"
+    ],
+    "double gameweek": [
+      "FantasyPL",
+      "PremierLeague"
+    ],
+    "draft fpl": [
+      "FantasyPL",
+      "PremierLeague"
+    ],
+    "dragon ball": [
+      "dbz"
+    ],
+    "drones": [
+      "drones",
+      "fpv"
+    ],
+    "drx": [
+      "ValorantCompetitive",
+      "VALORANT"
+    ],
+    "dune": [
+      "dune",
+      "movies"
+    ],
+    "dungeons and dragons": [
+      "DnD",
+      "dndnext"
+    ],
+    "ea fc": [
+      "EASportsFC",
+      "FifaCareers"
+    ],
+    "edg valorant": [
+      "ValorantCompetitive",
+      "VALORANT"
+    ],
+    "edh": [
+      "EDH",
+      "magicTCG"
+    ],
+    "edm": [
+      "EDM",
+      "electronicmusic"
+    ],
+    "edward gaming": [
+      "ValorantCompetitive",
+      "VALORANT"
+    ],
+    "elden ring": [
+      "Eldenring",
+      "fromsoftware",
+      "gaming"
+    ],
+    "elder scrolls online": [
+      "elderscrollsonline"
+    ],
+    "election": [
+      "politics",
+      "PoliticalDiscussion",
+      "news"
+    ],
+    "electric vehicles": [
+      "electricvehicles",
+      "teslamotors"
+    ],
+    "electronic music": [
+      "electronicmusic",
+      "EDM"
+    ],
+    "elgato": [
+      "elgato",
+      "obs",
+      "Twitch"
+    ],
+    "elite dangerous": [
+      "EliteDangerous"
+    ],
+    "emacs": [
+      "emacs"
+    ],
+    "emergency fund": [
+      "personalfinance",
+      "Bogleheads"
+    ],
+    "emulation": [
+      "emulation",
+      "RetroArch"
+    ],
+    "ender 3": [
+      "ender3",
+      "3Dprinting"
+    ],
+    "escape from tarkov": [
+      "EscapefromTarkov",
+      "TarkovMemes"
+    ],
+    "eso": [
+      "elderscrollsonline"
+    ],
+    "esphome": [
+      "homeassistant",
+      "smarthome"
+    ],
+    "esports world cup": [
+      "esports",
+      "leagueoflegends",
+      "ValorantCompetitive"
+    ],
+    "espresso": [
+      "espresso",
+      "Coffee"
+    ],
+    "etf investing": [
+      "ETFs",
+      "investing",
+      "Bogleheads"
+    ],
+    "eth": [
+      "ethereum",
+      "CryptoCurrency"
+    ],
+    "ethereum": [
+      "ethereum",
+      "CryptoCurrency",
+      "ethdev",
+      "ethfinance"
+    ],
+    "eu4": [
+      "eu4",
+      "paradoxplaza"
+    ],
+    "euro": [
+      "soccer",
+      "Euro2024"
+    ],
+    "eve online": [
+      "eve"
+    ],
+    "expense ratio": [
+      "Bogleheads",
+      "investing"
+    ],
+    "express": [
+      "node",
+      "javascript",
+      "webdev"
+    ],
+    "f1": [
+      "formula1",
+      "F1Technical"
+    ],
+    "factorio": [
+      "factorio"
+    ],
+    "faker": [
+      "leagueoflegends",
+      "T1",
+      "lolesports"
+    ],
+    "fanatec": [
+      "Fanatec",
+      "simracing"
+    ],
+    "fantasy baseball": [
+      "fantasybaseball",
+      "baseball"
+    ],
+    "fantasy basketball": [
+      "fantasybball",
+      "nba"
+    ],
+    "fantasy bball": [
+      "fantasybball",
+      "nba"
+    ],
+    "fantasy books": [
+      "Fantasy",
+      "books"
+    ],
+    "fantasy football": [
+      "FantasyPL",
+      "fantasyfootball",
+      "PremierLeague"
+    ],
+    "fantasy premier league": [
+      "FantasyPL",
+      "PremierLeague",
+      "soccer"
+    ],
+    "fastapi": [
+      "fastapi",
+      "Python",
+      "webdev"
+    ],
+    "fate grand order": [
+      "grandorder"
+    ],
+    "faze": [
+      "GlobalOffensive",
+      "cs2"
+    ],
+    "fc 26": [
+      "EASportsFC",
+      "FifaCareers"
+    ],
+    "fdm printing": [
+      "3Dprinting",
+      "FixMyPrint"
+    ],
+    "fedora": [
+      "Fedora",
+      "linux"
+    ],
+    "final fantasy 14": [
+      "ffxiv"
+    ],
+    "final fantasy xiv": [
+      "ffxiv"
+    ],
+    "financial independence": [
+      "financialindependence",
+      "Fire",
+      "Bogleheads"
+    ],
+    "fine-tuning": [
+      "MachineLearning",
+      "LocalLLaMA",
+      "deeplearning"
+    ],
+    "finetuning": [
+      "MachineLearning",
+      "LocalLLaMA",
+      "deeplearning"
+    ],
+    "flask": [
+      "flask",
+      "Python",
+      "webdev"
+    ],
+    "flight sim": [
+      "flightsim",
+      "MicrosoftFlightSim"
+    ],
+    "flux": [
+      "StableDiffusion",
+      "comfyui"
+    ],
+    "fluxcd": [
+      "kubernetes",
+      "devops"
+    ],
+    "fnatic": [
+      "leagueoflegends",
+      "GlobalOffensive",
+      "ValorantCompetitive"
+    ],
+    "fooocus": [
+      "StableDiffusion",
+      "comfyui"
+    ],
+    "football": [
+      "soccer",
+      "PremierLeague",
+      "football"
+    ],
+    "football manager": [
+      "footballmanagergames"
+    ],
+    "forge": [
+      "StableDiffusion",
+      "comfyui"
+    ],
+    "formula 1": [
+      "formula1",
+      "F1Technical"
+    ],
+    "formula e": [
+      "FormulaE",
+      "electricvehicles"
+    ],
+    "fortnite": [
+      "FortNiteBR",
+      "FortniteCompetitive",
+      "gaming"
+    ],
+    "fpl": [
+      "FantasyPL",
+      "PremierLeague",
+      "soccer"
+    ],
+    "fpl bench boost": [
+      "FantasyPL"
+    ],
+    "fpl free hit": [
+      "FantasyPL"
+    ],
+    "fpl triple captain": [
+      "FantasyPL"
+    ],
+    "fpl wildcard": [
+      "FantasyPL"
+    ],
+    "fpv drones": [
+      "fpv",
+      "multicopter"
+    ],
+    "frame generation": [
+      "nvidia",
+      "Amd",
+      "hardware"
+    ],
+    "frieren": [
+      "Frieren"
+    ],
+    "frigate": [
+      "homeassistant",
+      "selfhosted"
+    ],
+    "g2 esports": [
+      "leagueoflegends",
+      "GlobalOffensive",
+      "ValorantCompetitive"
+    ],
+    "game of thrones": [
+      "gameofthrones",
+      "asoiaf"
+    ],
+    "gaming": [
+      "gaming",
+      "pcgaming",
+      "Games"
+    ],
+    "gcp": [
+      "googlecloud",
+      "devops",
+      "sysadmin"
+    ],
+    "geforce now": [
+      "GeForceNOW",
+      "nvidia"
+    ],
+    "gemini": [
+      "Bard",
+      "MachineLearning",
+      "artificial",
+      "OpenAI",
+      "singularity"
+    ],
+    "gen g": [
+      "ValorantCompetitive",
+      "leagueoflegends",
+      "lolesports"
+    ],
+    "geng": [
+      "ValorantCompetitive",
+      "leagueoflegends",
+      "lolesports"
+    ],
+    "genshin impact": [
+      "Genshin_Impact"
+    ],
+    "git": [
+      "git",
+      "programming",
+      "learnprogramming"
+    ],
+    "github": [
+      "github",
+      "programming",
+      "opensource"
+    ],
+    "github actions": [
+      "github",
+      "devops",
+      "programming"
+    ],
+    "github copilot": [
+      "github",
+      "ChatGPTCoding",
+      "programming"
+    ],
+    "gitlab ci": [
+      "gitlab",
+      "devops",
+      "programming"
+    ],
+    "go": [
+      "golang",
+      "programming"
+    ],
+    "golang": [
+      "golang",
+      "programming"
+    ],
+    "golf": [
+      "golf"
+    ],
+    "google ai": [
+      "Bard",
+      "MachineLearning",
+      "artificial"
+    ],
+    "google ai studio": [
+      "Bard",
+      "OpenAI",
+      "singularity"
+    ],
+    "google pixel": [
+      "GooglePixel",
+      "Android"
+    ],
+    "gpt": [
+      "ChatGPT",
+      "OpenAI",
+      "MachineLearning",
+      "LocalLLaMA"
+    ],
+    "gpt 4": [
+      "OpenAI",
+      "ChatGPT",
+      "singularity"
+    ],
+    "gpt 4o": [
+      "OpenAI",
+      "ChatGPT",
+      "singularity"
+    ],
+    "gpt 5": [
+      "OpenAI",
+      "ChatGPT",
+      "singularity"
+    ],
+    "gpt-4": [
+      "ChatGPT",
+      "OpenAI",
+      "MachineLearning"
+    ],
+    "gpt-4o": [
+      "ChatGPT",
+      "OpenAI",
+      "MachineLearning"
+    ],
+    "gpu": [
+      "hardware",
+      "nvidia",
+      "Amd",
+      "MachineLearning"
+    ],
+    "gpu upgrade": [
+      "buildapc",
+      "pcmasterrace",
+      "hardware"
+    ],
+    "grad school": [
+      "gradadmissions",
+      "college"
+    ],
+    "grafana": [
+      "grafana",
+      "devops",
+      "kubernetes"
+    ],
+    "grinder": [
+      "Coffee",
+      "espresso"
+    ],
+    "grok": [
+      "singularity",
+      "OpenAI"
+    ],
+    "groq": [
+      "singularity",
+      "LocalLLaMA"
+    ],
+    "gta": [
+      "GTA",
+      "gtaonline",
+      "gaming"
+    ],
+    "guild wars 2": [
+      "Guildwars2"
+    ],
+    "guilty gear strive": [
+      "Guiltygear",
+      "fighters"
+    ],
+    "haaland": [
+      "soccer",
+      "MCFC",
+      "PremierLeague"
+    ],
+    "hacking": [
+      "hacking",
+      "netsec",
+      "cybersecurity"
+    ],
+    "hades": [
+      "HadesTheGame"
+    ],
+    "hbo": [
+      "television",
+      "HBOMAX"
+    ],
+    "headphones": [
+      "headphones",
+      "HeadphoneAdvice",
+      "audiophile"
+    ],
+    "hearthstone": [
+      "hearthstone",
+      "CompetitiveHS"
+    ],
+    "heat": [
+      "heat",
+      "nba"
+    ],
+    "helldivers 2": [
+      "Helldivers",
+      "Helldivers2"
+    ],
+    "helm": [
+      "kubernetes",
+      "devops"
+    ],
+    "high protein meals": [
+      "EatCheapAndHealthy",
+      "MealPrepSunday"
+    ],
+    "hip hop": [
+      "hiphopheads",
+      "Music"
+    ],
+    "hockey": [
+      "hockey",
+      "nhl"
+    ],
+    "hodl": [
+      "Bitcoin",
+      "CryptoCurrency"
+    ],
+    "hollow knight": [
+      "HollowKnight"
+    ],
+    "home assistant": [
+      "homeassistant",
+      "selfhosted",
+      "smarthome"
+    ],
+    "home networking": [
+      "HomeNetworking",
+      "networking",
+      "selfhosted"
+    ],
+    "homebridge": [
+      "homebridge",
+      "selfhosted",
+      "smarthome"
+    ],
+    "homelab": [
+      "homelab",
+      "selfhosted"
+    ],
+    "honkai star rail": [
+      "HonkaiStarRail"
+    ],
+    "horror movies": [
+      "horror",
+      "movies"
+    ],
+    "house of the dragon": [
+      "HouseOfTheDragon",
+      "asoiaf"
+    ],
+    "hugging face": [
+      "MachineLearning",
+      "LocalLLaMA",
+      "deeplearning",
+      "OpenAI"
+    ],
+    "huggingface": [
+      "MachineLearning",
+      "LocalLLaMA",
+      "deeplearning"
+    ],
+    "hunter x hunter": [
+      "HunterXHunter"
+    ],
+    "hyprland": [
+      "hyprland",
+      "unixporn"
+    ],
+    "iac": [
+      "Terraform",
+      "devops"
+    ],
+    "iem": [
+      "GlobalOffensive",
+      "cs2"
+    ],
+    "iems": [
+      "inearfidelity",
+      "headphones",
+      "HeadphoneAdvice"
+    ],
+    "image generation ui": [
+      "StableDiffusion",
+      "comfyui"
+    ],
+    "immich": [
+      "immich",
+      "selfhosted"
+    ],
+    "index fund investing": [
+      "Bogleheads",
+      "investing",
+      "personalfinance"
+    ],
+    "index funds": [
+      "Bogleheads",
+      "investing",
+      "personalfinance"
+    ],
+    "infosec": [
+      "netsec",
+      "cybersecurity",
+      "AskNetsec"
+    ],
+    "infrastructure as code": [
+      "Terraform",
+      "devops"
+    ],
+    "ingress nginx": [
+      "kubernetes",
+      "devops"
+    ],
+    "inscryption": [
+      "inscryption"
+    ],
+    "intel": [
+      "intel",
+      "hardware",
+      "buildapc"
+    ],
+    "intel arc": [
+      "IntelArc",
+      "buildapc",
+      "hardware"
+    ],
+    "intel core ultra": [
+      "intel",
+      "buildapc",
+      "hardware"
+    ],
+    "intel cpu": [
+      "intel",
+      "buildapc",
+      "hardware"
+    ],
+    "intel gpus": [
+      "IntelArc",
+      "buildapc",
+      "hardware"
+    ],
+    "internships": [
+      "internships",
+      "cscareerquestions"
+    ],
+    "interview prep": [
+      "leetcode",
+      "cscareerquestions"
+    ],
+    "investing": [
+      "investing",
+      "stocks",
+      "personalfinance"
+    ],
+    "invincible": [
+      "Invincible",
+      "television"
+    ],
+    "invoke ai": [
+      "StableDiffusion",
+      "comfyui"
+    ],
+    "ipad": [
+      "ipad",
+      "apple"
+    ],
+    "iphone": [
+      "iphone",
+      "apple",
+      "ios"
+    ],
+    "jaeger": [
+      "devops",
+      "kubernetes"
+    ],
+    "java": [
+      "java",
+      "learnjava",
+      "programming"
+    ],
+    "javascript": [
+      "javascript",
+      "webdev",
+      "programming"
+    ],
+    "jellyfin": [
+      "jellyfin",
+      "selfhosted"
+    ],
+    "jenkins": [
+      "jenkinsci",
+      "devops"
+    ],
+    "job search": [
+      "jobs",
+      "careeradvice"
+    ],
+    "jujutsu kaisen": [
+      "JuJutsuKaisen"
+    ],
+    "juventus": [
+      "Juve",
+      "soccer",
+      "SerieA"
+    ],
+    "k3s": [
+      "kubernetes",
+      "selfhosted",
+      "homelab"
+    ],
+    "k8s": [
+      "kubernetes",
+      "devops",
+      "sysadmin"
+    ],
+    "katowice": [
+      "GlobalOffensive",
+      "cs2"
+    ],
+    "kerbal space program": [
+      "KerbalSpaceProgram"
+    ],
+    "keyboard switches": [
+      "MechanicalKeyboards",
+      "CustomKeyboards"
+    ],
+    "keycaps": [
+      "MechanicalKeyboards",
+      "CustomKeyboards"
+    ],
+    "knicks": [
+      "NYKnicks",
+      "nba"
+    ],
+    "koboldcpp": [
+      "LocalLLaMA"
+    ],
+    "kotlin": [
+      "Kotlin",
+      "androiddev",
+      "programming"
+    ],
+    "kpop": [
+      "kpop",
+      "Music"
+    ],
+    "kubernetes": [
+      "kubernetes",
+      "devops",
+      "sysadmin"
+    ],
+    "l2": [
+      "ethereum",
+      "ethfinance",
+      "CryptoCurrency"
+    ],
+    "la liga": [
+      "LaLiga",
+      "soccer",
+      "realmadrid"
+    ],
+    "lakers": [
+      "lakers",
+      "nba",
+      "basketball"
+    ],
+    "langchain": [
+      "LangChain",
+      "LocalLLaMA",
+      "MachineLearning",
+      "OpenAI",
+      "programming"
+    ],
+    "langgraph": [
+      "LocalLLaMA",
+      "OpenAI",
+      "programming"
+    ],
+    "laptop": [
+      "laptops",
+      "hardware",
+      "SuggestALaptop"
+    ],
+    "layer 2": [
+      "ethereum",
+      "ethfinance",
+      "CryptoCurrency"
+    ],
+    "lck": [
+      "leagueoflegends",
+      "lolesports"
+    ],
+    "league arena": [
+      "leagueoflegends",
+      "TeamfightTactics"
+    ],
+    "league esports": [
+      "leagueoflegends",
+      "lolesports"
+    ],
+    "league of legends": [
+      "leagueoflegends",
+      "summonerschool",
+      "gaming"
+    ],
+    "league of legends esports": [
+      "leagueoflegends",
+      "lolesports"
+    ],
+    "lebron": [
+      "nba",
+      "lakers"
+    ],
+    "lec": [
+      "leagueoflegends",
+      "lolesports"
+    ],
+    "leetcode": [
+      "leetcode",
+      "cscareerquestions"
+    ],
+    "legends of runeterra": [
+      "LegendsOfRuneterra",
+      "LoRCompetitive"
+    ],
+    "legion go": [
+      "LegionGo",
+      "pcgaming"
+    ],
+    "letterboxd": [
+      "Letterboxd",
+      "movies"
+    ],
+    "light novels": [
+      "LightNovels",
+      "anime"
+    ],
+    "ligue 1": [
+      "Ligue1",
+      "soccer",
+      "psg"
+    ],
+    "linux": [
+      "linux",
+      "sysadmin",
+      "linuxquestions"
+    ],
+    "liverpool": [
+      "LiverpoolFC",
+      "soccer",
+      "PremierLeague"
+    ],
+    "llama": [
+      "LocalLLaMA",
+      "MachineLearning",
+      "artificial"
+    ],
+    "llama cpp": [
+      "LocalLLaMA"
+    ],
+    "llamaindex": [
+      "LangChain",
+      "LocalLLaMA",
+      "MachineLearning"
+    ],
+    "llm inference": [
+      "LocalLLaMA",
+      "MachineLearning"
+    ],
+    "lm studio": [
+      "LocalLLaMA"
+    ],
+    "logging": [
+      "devops",
+      "sysadmin"
+    ],
+    "loki": [
+      "grafana",
+      "devops"
+    ],
+    "lol": [
+      "leagueoflegends",
+      "summonerschool",
+      "gaming"
+    ],
+    "lolesports": [
+      "leagueoflegends",
+      "lolesports"
+    ],
+    "longhorn": [
+      "kubernetes",
+      "selfhosted"
+    ],
+    "lora training": [
+      "StableDiffusion",
+      "LocalLLaMA",
+      "comfyui"
+    ],
+    "lord of the rings": [
+      "lotr",
+      "LOTR_on_Prime"
+    ],
+    "lost ark": [
+      "lostarkgame"
+    ],
+    "lovable": [
+      "ChatGPTCoding",
+      "OpenAI"
+    ],
+    "lpl": [
+      "leagueoflegends",
+      "lolesports"
+    ],
+    "lta": [
+      "leagueoflegends",
+      "lolesports"
+    ],
+    "lucid": [
+      "LucidMotors",
+      "electricvehicles"
+    ],
+    "macbook": [
+      "mac",
+      "apple",
+      "macbook"
+    ],
+    "machine learning": [
+      "MachineLearning",
+      "learnmachinelearning",
+      "deeplearning"
+    ],
+    "magic arena": [
+      "MagicArena",
+      "magicTCG"
+    ],
+    "magic draft": [
+      "MagicArena",
+      "magicTCG"
+    ],
+    "magic sealed": [
+      "MagicArena",
+      "magicTCG"
+    ],
+    "magic the gathering": [
+      "magicTCG",
+      "MagicArena"
+    ],
+    "mahomes": [
+      "nfl",
+      "KansasCityChiefs"
+    ],
+    "malware": [
+      "Malware",
+      "netsec",
+      "cybersecurity"
+    ],
+    "man city": [
+      "MCFC",
+      "PremierLeague",
+      "soccer"
+    ],
+    "manchester city": [
+      "MCFC",
+      "soccer",
+      "PremierLeague"
+    ],
+    "manchester united": [
+      "reddevils",
+      "soccer",
+      "PremierLeague"
+    ],
+    "manga": [
+      "manga",
+      "anime"
+    ],
+    "manga collecting": [
+      "MangaCollectors",
+      "manga"
+    ],
+    "marathon training": [
+      "running",
+      "AdvancedRunning"
+    ],
+    "marvel": [
+      "marvelstudios",
+      "Marvel",
+      "comicbooks"
+    ],
+    "marvel spoilers": [
+      "MarvelStudiosSpoilers",
+      "marvelstudios"
+    ],
+    "master duel": [
+      "masterduel",
+      "yugioh"
+    ],
+    "masters degree": [
+      "gradadmissions",
+      "college"
+    ],
+    "masters toronto": [
+      "ValorantCompetitive",
+      "VALORANT"
+    ],
+    "mavericks": [
+      "Mavericks",
+      "nba"
+    ],
+    "mavs": [
+      "Mavericks",
+      "nba"
+    ],
+    "max": [
+      "HBOMAX",
+      "television"
+    ],
+    "mbappe": [
+      "soccer",
+      "realmadrid",
+      "FrenchFootball"
+    ],
+    "mcp": [
+      "ChatGPTCoding",
+      "OpenAI",
+      "LocalLLaMA"
+    ],
+    "meal ideas": [
+      "recipes",
+      "EatCheapAndHealthy"
+    ],
+    "meal prep": [
+      "MealPrepSunday",
+      "EatCheapAndHealthy"
+    ],
+    "meal prep ideas": [
+      "MealPrepSunday",
+      "EatCheapAndHealthy"
+    ],
+    "meal prep recipes": [
+      "MealPrepSunday",
+      "EatCheapAndHealthy"
+    ],
+    "mechanical keyboards": [
+      "MechanicalKeyboards",
+      "CustomKeyboards",
+      "BudgetKeebs"
+    ],
+    "memecoin": [
+      "CryptoCurrency"
+    ],
+    "memecoins": [
+      "CryptoCurrency"
+    ],
+    "messi": [
+      "soccer",
+      "Barca",
+      "argentina"
+    ],
+    "meta ai": [
+      "LocalLLaMA",
+      "MachineLearning",
+      "artificial"
+    ],
+    "metal": [
+      "Metal",
+      "Music"
+    ],
+    "mice": [
+      "MouseReview",
+      "MousepadReview"
+    ],
+    "microsoft flight simulator": [
+      "MicrosoftFlightSim",
+      "flightsim"
+    ],
+    "midjourney": [
+      "midjourney",
+      "StableDiffusion",
+      "artificial"
+    ],
+    "mikrotik": [
+      "mikrotik",
+      "networking"
+    ],
+    "minecraft": [
+      "Minecraft",
+      "gaming"
+    ],
+    "mini painting": [
+      "minipainting",
+      "Warhammer40k"
+    ],
+    "minio": [
+      "selfhosted",
+      "homelab"
+    ],
+    "mistral": [
+      "LocalLLaMA",
+      "MachineLearning",
+      "artificial",
+      "OpenAI",
+      "singularity"
+    ],
+    "miyoo mini": [
+      "MiyooMini",
+      "SBCGaming"
+    ],
+    "mlb": [
+      "baseball",
+      "mlb"
+    ],
+    "mls": [
+      "MLS",
+      "soccer"
+    ],
+    "mlx": [
+      "LocalLLaMA",
+      "apple"
+    ],
+    "mma": [
+      "MMA",
+      "ufc"
+    ],
+    "modded handhelds": [
+      "SBCGaming",
+      "emulation"
+    ],
+    "model context protocol": [
+      "ChatGPTCoding",
+      "OpenAI",
+      "LocalLLaMA"
+    ],
+    "monitoring": [
+      "devops",
+      "sysadmin",
+      "kubernetes"
+    ],
+    "monitors": [
+      "Monitors",
+      "buildapcmonitors"
+    ],
+    "monster hunter": [
+      "MonsterHunter",
+      "MonsterHunterMeta"
+    ],
+    "monster hunter wilds": [
+      "MonsterHunter",
+      "MonsterHunterMeta"
+    ],
+    "motion graphics": [
+      "AfterEffects",
+      "VideoEditing"
+    ],
+    "mousepads": [
+      "MousepadReview",
+      "MouseReview"
+    ],
+    "movie leaks": [
+      "MarvelStudiosSpoilers",
+      "starwarsspeculation"
+    ],
+    "movie recommendations": [
+      "movies",
+      "MovieSuggestions"
+    ],
+    "movies": [
+      "movies",
+      "Letterboxd"
+    ],
+    "moza racing": [
+      "simracing"
+    ],
+    "mtg arena": [
+      "MagicArena",
+      "magicTCG"
+    ],
+    "music": [
+      "Music",
+      "popheads",
+      "hiphopheads"
+    ],
+    "my hero academia": [
+      "BokuNoHeroAcademia"
+    ],
+    "naruto": [
+      "Naruto"
+    ],
+    "nas": [
+      "DataHoarder",
+      "selfhosted",
+      "homelab"
+    ],
+    "navi cs": [
+      "GlobalOffensive",
+      "cs2"
+    ],
+    "navi valorant": [
+      "ValorantCompetitive",
+      "VALORANT"
+    ],
+    "navidrome": [
+      "navidrome",
+      "selfhosted"
+    ],
+    "nba": [
+      "nba",
+      "NBAdiscussion",
+      "basketball",
+      "fantasybball"
+    ],
+    "nba 2k": [
+      "NBA2k"
+    ],
+    "neovim": [
+      "neovim",
+      "vim"
+    ],
+    "net worth": [
+      "financialindependence",
+      "Bogleheads"
+    ],
+    "netflix": [
+      "netflix",
+      "NetflixBestOf"
+    ],
+    "network attached storage": [
+      "DataHoarder",
+      "selfhosted",
+      "homelab"
+    ],
+    "networking": [
+      "networking",
+      "HomeNetworking",
+      "sysadmin"
+    ],
+    "neural network": [
+      "MachineLearning",
+      "deeplearning",
+      "learnmachinelearning"
+    ],
+    "new world": [
+      "newworldgame"
+    ],
+    "newcastle united": [
+      "NUFC",
+      "PremierLeague",
+      "soccer"
+    ],
+    "news": [
+      "news",
+      "worldnews",
+      "UpliftingNews"
+    ],
+    "next.js": [
+      "nextjs",
+      "webdev",
+      "reactjs"
+    ],
+    "nextcloud": [
+      "NextCloud",
+      "selfhosted"
+    ],
+    "nextjs": [
+      "nextjs",
+      "webdev",
+      "reactjs"
+    ],
+    "nfl": [
+      "nfl",
+      "fantasyfootball",
+      "NFLNoobs"
+    ],
+    "nfl fantasy": [
+      "fantasyfootball",
+      "nfl"
+    ],
+    "nft": [
+      "NFT",
+      "CryptoCurrency"
+    ],
+    "nfts": [
+      "NFT",
+      "CryptoCurrency"
+    ],
+    "nginx": [
+      "nginx",
+      "sysadmin",
+      "devops"
+    ],
+    "nhl": [
+      "hockey",
+      "nhl"
+    ],
+    "nikke": [
+      "NikkeMobile"
+    ],
+    "nintendo": [
+      "nintendo",
+      "NintendoSwitch",
+      "gaming"
+    ],
+    "nixos": [
+      "NixOS",
+      "linux"
+    ],
+    "no mans sky": [
+      "NoMansSkyTheGame"
+    ],
+    "node red": [
+      "nodered",
+      "homeassistant",
+      "selfhosted"
+    ],
+    "node.js": [
+      "node",
+      "javascript",
+      "webdev"
+    ],
+    "nodejs": [
+      "node",
+      "javascript",
+      "webdev"
+    ],
+    "notebooklm": [
+      "Bard",
+      "OpenAI",
+      "singularity"
+    ],
+    "nutrition": [
+      "nutrition",
+      "fitness"
+    ],
+    "nvidia": [
+      "nvidia",
+      "hardware",
+      "buildapc",
+      "MachineLearning",
+      "pcmasterrace"
+    ],
+    "nvidia gpus": [
+      "nvidia",
+      "buildapc",
+      "pcmasterrace"
+    ],
+    "obs": [
+      "obs",
+      "Twitch",
+      "streaming"
+    ],
+    "obs studio": [
+      "obs",
+      "Twitch",
+      "streaming"
+    ],
+    "observability": [
+      "devops",
+      "kubernetes",
+      "sysadmin"
+    ],
+    "old school runescape": [
+      "2007scape",
+      "runescape"
+    ],
+    "oled monitors": [
+      "Monitors",
+      "OLED_Gaming"
+    ],
+    "ollama": [
+      "ollama",
+      "LocalLLaMA"
+    ],
+    "ollama webui": [
+      "OpenWebUI",
+      "ollama",
+      "LocalLLaMA"
+    ],
+    "onchain": [
+      "ethfinance",
+      "CryptoCurrency"
+    ],
+    "one piece": [
+      "OnePiece",
+      "Piratefolk"
+    ],
+    "open webui": [
+      "OpenWebUI",
+      "ollama",
+      "LocalLLaMA"
+    ],
+    "openai": [
+      "OpenAI",
+      "ChatGPT",
+      "MachineLearning",
+      "artificial"
+    ],
+    "openai api": [
+      "OpenAI",
+      "ChatGPTCoding",
+      "programming"
+    ],
+    "openrouter": [
+      "OpenAI",
+      "LocalLLaMA",
+      "ChatGPTCoding"
+    ],
+    "opentelemetry": [
+      "devops",
+      "kubernetes"
+    ],
+    "openwrt": [
+      "openwrt",
+      "HomeNetworking"
+    ],
+    "opnsense": [
+      "OPNsenseFirewall",
+      "homelab"
+    ],
+    "optimism": [
+      "optimism",
+      "ethfinance",
+      "CryptoCurrency"
+    ],
+    "options trading": [
+      "options",
+      "wallstreetbets",
+      "stocks"
+    ],
+    "oscar buzz": [
+      "oscarrace",
+      "movies"
+    ],
+    "oshi no ko": [
+      "OshiNoKo"
+    ],
+    "osu": [
+      "osugame"
+    ],
+    "otel": [
+      "devops",
+      "kubernetes"
+    ],
+    "overwatch": [
+      "Overwatch",
+      "gaming",
+      "Competitiveoverwatch"
+    ],
+    "overwatch 2": [
+      "Overwatch",
+      "Competitiveoverwatch"
+    ],
+    "palworld": [
+      "Palworld"
+    ],
+    "paper rex": [
+      "ValorantCompetitive",
+      "VALORANT"
+    ],
+    "paperless ngx": [
+      "paperlessngx",
+      "selfhosted"
+    ],
+    "password managers": [
+      "Bitwarden",
+      "privacy",
+      "selfhosted"
+    ],
+    "path of exile": [
+      "pathofexile",
+      "PathOfExileBuilds"
+    ],
+    "path of exile 2": [
+      "pathofexile",
+      "PathOfExileBuilds"
+    ],
+    "pathfinder 2e": [
+      "Pathfinder2e"
+    ],
+    "pc build": [
+      "buildapc",
+      "hardware",
+      "pcmasterrace"
+    ],
+    "pc gaming": [
+      "pcgaming",
+      "gaming",
+      "buildapc"
+    ],
+    "pcmr": [
+      "pcmasterrace",
+      "buildapc",
+      "hardware"
+    ],
+    "penny stocks": [
+      "pennystocks",
+      "stocks"
+    ],
+    "perplexity": [
+      "artificial",
+      "MachineLearning",
+      "ChatGPT"
+    ],
+    "personal finance": [
+      "personalfinance",
+      "Bogleheads",
+      "investing"
+    ],
+    "pfsense": [
+      "PFSENSE",
+      "HomeNetworking",
+      "sysadmin"
+    ],
+    "phd applications": [
+      "gradadmissions",
+      "AskAcademia"
+    ],
+    "photography": [
+      "photography",
+      "AskPhotography"
+    ],
+    "php": [
+      "PHP",
+      "webdev",
+      "programming"
+    ],
+    "pihole": [
+      "pihole",
+      "selfhosted"
+    ],
+    "pizza making": [
+      "Pizza",
+      "Cooking"
+    ],
+    "planet coaster": [
+      "PlanetCoaster"
+    ],
+    "planet zoo": [
+      "PlanetZoo"
+    ],
+    "playstation": [
+      "playstation",
+      "PS5",
+      "gaming"
+    ],
+    "plex": [
+      "Plex",
+      "selfhosted"
+    ],
+    "pokemon tcg": [
+      "PokemonTCG",
+      "pkmntcg"
+    ],
+    "pokemon tcg live": [
+      "ptcgl",
+      "pkmntcg",
+      "PokemonTCG"
+    ],
+    "pokemon tcg pocket": [
+      "PTCGP",
+      "PokemonTCG"
+    ],
+    "pokemon trading card game": [
+      "PokemonTCG",
+      "pkmntcg"
+    ],
+    "politics": [
+      "politics",
+      "worldnews",
+      "PoliticalDiscussion"
+    ],
+    "polygon": [
+      "0xPolygon",
+      "CryptoCurrency"
+    ],
+    "pop music": [
+      "popheads",
+      "Music"
+    ],
+    "portainer": [
+      "portainer",
+      "selfhosted",
+      "docker"
+    ],
+    "pour over": [
+      "Coffee"
+    ],
+    "powerlifting": [
+      "powerlifting",
+      "weightroom"
+    ],
+    "premier league": [
+      "PremierLeague",
+      "soccer",
+      "FantasyPL"
+    ],
+    "premiere pro": [
+      "premiere",
+      "VideoEditing"
+    ],
+    "preworkout": [
+      "Supplements",
+      "fitness"
+    ],
+    "price changes": [
+      "FantasyPL"
+    ],
+    "privacy": [
+      "privacy",
+      "netsec",
+      "PrivacyGuides"
+    ],
+    "privacy tools": [
+      "privacy",
+      "PrivacyGuides"
+    ],
+    "progression fantasy": [
+      "ProgressionFantasy",
+      "Fantasy"
+    ],
+    "prometheus": [
+      "PrometheusMonitoring",
+      "devops",
+      "kubernetes"
+    ],
+    "prompt engineering": [
+      "ChatGPT",
+      "OpenAI",
+      "MachineLearning"
+    ],
+    "protein powder": [
+      "Supplements",
+      "fitness"
+    ],
+    "proxmox": [
+      "Proxmox",
+      "homelab",
+      "selfhosted"
+    ],
+    "prusa": [
+      "prusa3d",
+      "3Dprinting"
+    ],
+    "prx": [
+      "ValorantCompetitive",
+      "VALORANT"
+    ],
+    "ps5": [
+      "PS5",
+      "playstation",
+      "gaming"
+    ],
+    "psg": [
+      "psg",
+      "soccer",
+      "Ligue1"
+    ],
+    "pulumi": [
+      "devops",
+      "programming"
+    ],
+    "python": [
+      "Python",
+      "learnpython",
+      "programming"
+    ],
+    "pytorch": [
+      "pytorch",
+      "MachineLearning",
+      "deeplearning"
+    ],
+    "qwen": [
+      "LocalLLaMA",
+      "OpenAI",
+      "singularity"
+    ],
+    "qwen coder": [
+      "LocalLLaMA",
+      "ChatGPTCoding",
+      "OpenAI"
+    ],
+    "rag": [
+      "LangChain",
+      "LocalLLaMA",
+      "MachineLearning"
+    ],
+    "rap": [
+      "hiphopheads",
+      "Music"
+    ],
+    "rate my team": [
+      "FantasyPL"
+    ],
+    "ray tracing": [
+      "nvidia",
+      "Amd",
+      "hardware"
+    ],
+    "re zero": [
+      "Re_Zero"
+    ],
+    "react": [
+      "reactjs",
+      "webdev",
+      "javascript"
+    ],
+    "reactjs": [
+      "reactjs",
+      "webdev",
+      "javascript"
+    ],
+    "real madrid": [
+      "realmadrid",
+      "soccer",
+      "LaLiga"
+    ],
+    "recipes": [
+      "recipes",
+      "Cooking"
+    ],
+    "replit agent": [
+      "replit",
+      "ChatGPTCoding",
+      "programming"
+    ],
+    "resin printing": [
+      "resinprinting",
+      "3Dprinting"
+    ],
+    "resume": [
+      "resumes",
+      "careeradvice"
+    ],
+    "retro gaming handhelds": [
+      "SBCGaming"
+    ],
+    "retro handhelds": [
+      "SBCGaming"
+    ],
+    "retroarch": [
+      "RetroArch",
+      "emulation"
+    ],
+    "retroid pocket": [
+      "retroid",
+      "SBCGaming"
+    ],
+    "reverse proxy": [
+      "selfhosted",
+      "sysadmin",
+      "devops"
+    ],
+    "rimworld": [
+      "RimWorld"
+    ],
+    "rivian": [
+      "Rivian",
+      "electricvehicles"
+    ],
+    "rlhf": [
+      "MachineLearning",
+      "deeplearning",
+      "artificial"
+    ],
+    "rocket league": [
+      "RocketLeague",
+      "RocketLeagueEsports"
+    ],
+    "rog ally": [
+      "ROGAlly",
+      "pcgaming"
+    ],
+    "rom hacking": [
+      "romhacking",
+      "emulation"
+    ],
+    "ronaldo": [
+      "soccer",
+      "realmadrid"
+    ],
+    "roo code": [
+      "ChatGPTCoding",
+      "OpenAI",
+      "LocalLLaMA"
+    ],
+    "rook ceph": [
+      "kubernetes",
+      "homelab"
+    ],
+    "roth ira": [
+      "personalfinance",
+      "Bogleheads"
+    ],
+    "rtx": [
+      "nvidia",
+      "hardware",
+      "buildapc",
+      "pcmasterrace"
+    ],
+    "rtx 4060": [
+      "nvidia",
+      "buildapc",
+      "pcmasterrace"
+    ],
+    "rtx 4070": [
+      "nvidia",
+      "buildapc",
+      "pcmasterrace"
+    ],
+    "rtx 4070 super": [
+      "nvidia",
+      "buildapc",
+      "pcmasterrace"
+    ],
+    "rtx 4080": [
+      "nvidia",
+      "buildapc",
+      "pcmasterrace"
+    ],
+    "rtx 4090": [
+      "nvidia",
+      "buildapc",
+      "pcmasterrace"
+    ],
+    "rtx 5060": [
+      "nvidia",
+      "buildapc",
+      "pcmasterrace"
+    ],
+    "rtx 5070": [
+      "nvidia",
+      "buildapc",
+      "pcmasterrace"
+    ],
+    "rtx 5080": [
+      "nvidia",
+      "buildapc",
+      "pcmasterrace"
+    ],
+    "rtx 5090": [
+      "nvidia",
+      "buildapc",
+      "pcmasterrace"
+    ],
+    "ruby": [
+      "ruby",
+      "rails",
+      "programming"
+    ],
+    "rugby": [
+      "rugbyunion"
+    ],
+    "runescape": [
+      "runescape",
+      "2007scape"
+    ],
+    "runescape pvm": [
+      "2007scape",
+      "runescape"
+    ],
+    "runeterra": [
+      "LegendsOfRuneterra",
+      "LoRCompetitive"
+    ],
+    "running": [
+      "running",
+      "AdvancedRunning"
+    ],
+    "rust": [
+      "rust",
+      "programming"
+    ],
+    "rx 7600": [
+      "Amd",
+      "buildapc",
+      "pcmasterrace"
+    ],
+    "rx 7700 xt": [
+      "Amd",
+      "buildapc",
+      "pcmasterrace"
+    ],
+    "rx 7800 xt": [
+      "Amd",
+      "buildapc",
+      "pcmasterrace"
+    ],
+    "rx 7900 xt": [
+      "Amd",
+      "buildapc",
+      "pcmasterrace"
+    ],
+    "rx 7900 xtx": [
+      "Amd",
+      "buildapc",
+      "pcmasterrace"
+    ],
+    "rx 9070": [
+      "Amd",
+      "buildapc",
+      "pcmasterrace"
+    ],
+    "rx 9070 xt": [
+      "Amd",
+      "buildapc",
+      "pcmasterrace"
+    ],
+    "ryzen 5": [
+      "Amd",
+      "buildapc",
+      "hardware"
+    ],
+    "ryzen 5600": [
+      "Amd",
+      "buildapc",
+      "hardware"
+    ],
+    "ryzen 7": [
+      "Amd",
+      "buildapc",
+      "hardware"
+    ],
+    "ryzen 7600": [
+      "Amd",
+      "buildapc",
+      "hardware"
+    ],
+    "ryzen 7800x3d": [
+      "Amd",
+      "buildapc",
+      "hardware"
+    ],
+    "ryzen 9": [
+      "Amd",
+      "buildapc",
+      "hardware"
+    ],
+    "ryzen 9800x3d": [
+      "Amd",
+      "buildapc",
+      "hardware"
+    ],
+    "samsung galaxy": [
+      "samsung",
+      "Android"
+    ],
+    "satisfactory": [
+      "SatisfactoryGame"
+    ],
+    "savings rate": [
+      "financialindependence",
+      "Bogleheads"
+    ],
+    "scala": [
+      "scala",
+      "programming"
+    ],
+    "sci fi movies": [
+      "movies",
+      "scifi"
+    ],
+    "scifi books": [
+      "printSF",
+      "books"
+    ],
+    "sd next": [
+      "StableDiffusion",
+      "comfyui"
+    ],
+    "security": [
+      "netsec",
+      "cybersecurity",
+      "AskNetsec"
+    ],
+    "self hosting": [
+      "selfhosted",
+      "homelab"
+    ],
+    "selfhosted": [
+      "selfhosted",
+      "homelab"
+    ],
+    "sen": [
+      "ValorantCompetitive",
+      "VALORANT"
+    ],
+    "sentinels": [
+      "ValorantCompetitive",
+      "VALORANT"
+    ],
+    "serie a": [
+      "SerieA",
+      "soccer",
+      "Juve"
+    ],
+    "severance": [
+      "SeveranceAppleTVPlus",
+      "television"
+    ],
+    "sffpc": [
+      "sffpc",
+      "buildapc"
+    ],
+    "sglang": [
+      "LocalLLaMA",
+      "MachineLearning"
+    ],
+    "shitcoin": [
+      "CryptoCurrency"
+    ],
+    "shitcoins": [
+      "CryptoCurrency"
+    ],
+    "sim racing": [
+      "simracing",
+      "Fanatec"
+    ],
+    "slay the spire": [
+      "slaythespire"
+    ],
+    "slicer settings": [
+      "3Dprinting",
+      "FixMyPrint"
+    ],
+    "smart home": [
+      "smarthome",
+      "homeassistant"
+    ],
+    "smartwatch": [
+      "AppleWatch",
+      "WearOS"
+    ],
+    "smoking meat": [
+      "smoking",
+      "BBQ"
+    ],
+    "soccer": [
+      "soccer",
+      "PremierLeague",
+      "MLS"
+    ],
+    "software engineer internship": [
+      "cscareerquestions",
+      "internships"
+    ],
+    "solana": [
+      "solana",
+      "CryptoCurrency"
+    ],
+    "solo leveling": [
+      "sololeveling"
+    ],
+    "sora": [
+      "OpenAI",
+      "artificial",
+      "MachineLearning"
+    ],
+    "specialty coffee": [
+      "Coffee",
+      "espresso"
+    ],
+    "spurs": [
+      "NBASpurs",
+      "nba"
+    ],
+    "spy x family": [
+      "SpyxFamily"
+    ],
+    "stable diffusion": [
+      "StableDiffusion",
+      "MachineLearning",
+      "artificial",
+      "comfyui"
+    ],
+    "stable swarm ui": [
+      "StableDiffusion",
+      "comfyui"
+    ],
+    "staking": [
+      "CryptoCurrency",
+      "ethfinance"
+    ],
+    "star citizen": [
+      "starcitizen"
+    ],
+    "star wars": [
+      "StarWars",
+      "starwarsspeculation"
+    ],
+    "star wars leaks": [
+      "starwarsspeculation",
+      "StarWars"
+    ],
+    "stardew valley": [
+      "StardewValley",
+      "FarmsofStardewValley"
+    ],
+    "steam": [
+      "Steam",
+      "pcgaming",
+      "gaming"
+    ],
+    "steam deck": [
+      "SteamDeck",
+      "pcgaming",
+      "gaming"
+    ],
+    "stocks": [
+      "stocks",
+      "investing",
+      "wallstreetbets"
+    ],
+    "stream deck": [
+      "elgato",
+      "Twitch",
+      "obs"
+    ],
+    "streaming setup": [
+      "obs",
+      "Twitch",
+      "streaming"
+    ],
+    "street fighter 6": [
+      "StreetFighter",
+      "fighters"
+    ],
+    "student loans": [
+      "StudentLoans",
+      "personalfinance"
+    ],
+    "student visa": [
+      "internationalstudents",
+      "college"
+    ],
+    "succession": [
+      "SuccessionTV",
+      "television"
+    ],
+    "sui": [
+      "CryptoCurrency"
+    ],
+    "suno": [
+      "singularity",
+      "OpenAI"
+    ],
+    "super smash bros": [
+      "smashbros",
+      "CrazyHand"
+    ],
+    "supplements": [
+      "Supplements",
+      "fitness"
+    ],
+    "svelte": [
+      "sveltejs",
+      "webdev",
+      "javascript"
+    ],
+    "swe internships": [
+      "cscareerquestions",
+      "internships"
+    ],
+    "swift": [
+      "swift",
+      "iOSProgramming",
+      "programming"
+    ],
+    "switch": [
+      "NintendoSwitch",
+      "nintendo",
+      "gaming"
+    ],
+    "sysadmin": [
+      "sysadmin",
+      "devops"
+    ],
+    "system design": [
+      "leetcode",
+      "cscareerquestions"
+    ],
+    "t1 esports": [
+      "leagueoflegends",
+      "T1",
+      "ValorantCompetitive"
+    ],
+    "t1 lol": [
+      "leagueoflegends",
+      "T1",
+      "lolesports"
+    ],
+    "t1 valorant": [
+      "ValorantCompetitive",
+      "VALORANT"
+    ],
+    "tabletop gaming": [
+      "boardgames"
+    ],
+    "tailscale": [
+      "Tailscale",
+      "selfhosted",
+      "sysadmin"
+    ],
+    "talos": [
+      "kubernetes",
+      "homelab"
+    ],
+    "tax loss harvesting": [
+      "Bogleheads",
+      "investing"
+    ],
+    "team heretics": [
+      "ValorantCompetitive",
+      "VALORANT"
+    ],
+    "team liquid": [
+      "ValorantCompetitive",
+      "GlobalOffensive",
+      "leagueoflegends"
+    ],
+    "teamfight tactics": [
+      "TeamfightTactics",
+      "CompetitiveTFT",
+      "leagueoflegends"
+    ],
+    "tech interviews": [
+      "leetcode",
+      "cscareerquestions"
+    ],
+    "tekken 8": [
+      "Tekken",
+      "fighters"
+    ],
+    "tennis": [
+      "tennis"
+    ],
+    "tensorflow": [
+      "tensorflow",
+      "MachineLearning",
+      "deeplearning"
+    ],
+    "terraform": [
+      "Terraform",
+      "devops",
+      "sysadmin"
+    ],
+    "terraform infrastructure": [
+      "Terraform",
+      "devops"
+    ],
+    "terraria": [
+      "Terraria"
+    ],
+    "tesla": [
+      "teslamotors",
+      "electricvehicles"
+    ],
+    "text generation webui": [
+      "LocalLLaMA"
+    ],
+    "th": [
+      "ValorantCompetitive",
+      "VALORANT"
+    ],
+    "the bear": [
+      "TheBear",
+      "television"
+    ],
+    "the boys": [
+      "TheBoys",
+      "television"
+    ],
+    "the international": [
+      "DotA2"
+    ],
+    "the last of us": [
+      "ThelastofusHBOseries",
+      "thelastofus"
+    ],
+    "tl": [
+      "ValorantCompetitive",
+      "GlobalOffensive",
+      "leagueoflegends"
+    ],
+    "tmux": [
+      "tmux",
+      "commandline"
+    ],
+    "together ai": [
+      "OpenAI",
+      "LocalLLaMA",
+      "singularity"
+    ],
+    "total war": [
+      "totalwar",
+      "totalwarhammer"
+    ],
+    "total war warhammer": [
+      "totalwarhammer",
+      "totalwar"
+    ],
+    "tottenham": [
+      "coys",
+      "soccer",
+      "PremierLeague"
+    ],
+    "tracing": [
+      "devops",
+      "kubernetes"
+    ],
+    "traefik": [
+      "Traefik",
+      "selfhosted",
+      "devops"
+    ],
+    "transformer": [
+      "MachineLearning",
+      "deeplearning",
+      "LocalLLaMA"
+    ],
+    "transport fever": [
+      "TransportFever"
+    ],
+    "truenas": [
+      "truenas",
+      "selfhosted",
+      "homelab"
+    ],
+    "trump": [
+      "politics",
+      "Conservative",
+      "news"
+    ],
+    "tv recommendations": [
+      "television",
+      "NetflixBestOf"
+    ],
+    "tv shows": [
+      "television",
+      "NetflixBestOf"
+    ],
+    "twitch streaming": [
+      "Twitch",
+      "obs",
+      "streaming"
+    ],
+    "typescript": [
+      "typescript",
+      "webdev",
+      "programming"
+    ],
+    "ubiquiti": [
+      "Ubiquiti",
+      "HomeNetworking"
+    ],
+    "ubuntu": [
+      "Ubuntu",
+      "linuxquestions"
+    ],
+    "ucl": [
+      "ChampionsLeague",
+      "soccer"
+    ],
+    "ufc": [
+      "ufc",
+      "MMA"
+    ],
+    "ultrawide monitors": [
+      "ultrawidemasterrace",
+      "Monitors"
+    ],
+    "unifi": [
+      "Ubiquiti",
+      "HomeNetworking"
+    ],
+    "unraid": [
+      "unRAID",
+      "selfhosted",
+      "homelab"
+    ],
+    "unsloth": [
+      "LocalLLaMA",
+      "MachineLearning"
+    ],
+    "v0": [
+      "ChatGPTCoding",
+      "OpenAI"
+    ],
+    "v60": [
+      "Coffee"
+    ],
+    "valorant": [
+      "VALORANT",
+      "ValorantCompetitive",
+      "gaming"
+    ],
+    "valorant champions": [
+      "ValorantCompetitive",
+      "VALORANT"
+    ],
+    "valorant masters": [
+      "ValorantCompetitive",
+      "VALORANT"
+    ],
+    "value investing": [
+      "ValueInvesting",
+      "investing"
+    ],
+    "vaultwarden": [
+      "vaultwarden",
+      "selfhosted"
+    ],
+    "vct": [
+      "ValorantCompetitive",
+      "VALORANT"
+    ],
+    "vct americas": [
+      "ValorantCompetitive",
+      "VALORANT"
+    ],
+    "vct emea": [
+      "ValorantCompetitive",
+      "VALORANT"
+    ],
+    "vct pacific": [
+      "ValorantCompetitive",
+      "VALORANT"
+    ],
+    "vector database": [
+      "MachineLearning",
+      "databases",
+      "LangChain"
+    ],
+    "vfx": [
+      "vfx",
+      "AfterEffects"
+    ],
+    "video editing": [
+      "VideoEditing",
+      "premiere",
+      "davinciresolve"
+    ],
+    "videography": [
+      "videography",
+      "VideoEditing"
+    ],
+    "vim": [
+      "vim",
+      "neovim"
+    ],
+    "vinyl": [
+      "vinyl",
+      "Music"
+    ],
+    "vitality": [
+      "GlobalOffensive",
+      "cs2"
+    ],
+    "vllm": [
+      "LocalLLaMA",
+      "MachineLearning"
+    ],
+    "voo": [
+      "Bogleheads",
+      "investing"
+    ],
+    "vpn": [
+      "VPN",
+      "privacy",
+      "netsec"
+    ],
+    "vt": [
+      "Bogleheads",
+      "investing"
+    ],
+    "vti": [
+      "Bogleheads",
+      "investing"
+    ],
+    "vtubers": [
+      "VirtualYoutubers"
+    ],
+    "vtubing": [
+      "VirtualYoutubers"
+    ],
+    "vue": [
+      "vuejs",
+      "webdev",
+      "javascript"
+    ],
+    "wallstreetbets": [
+      "wallstreetbets",
+      "stocks"
+    ],
+    "war thunder": [
+      "Warthunder"
+    ],
+    "warframe": [
+      "Warframe"
+    ],
+    "warhammer 40k": [
+      "Warhammer40k"
+    ],
+    "warriors": [
+      "warriors",
+      "nba"
+    ],
+    "watchtower": [
+      "selfhosted",
+      "docker"
+    ],
+    "wear os": [
+      "WearOS",
+      "Android"
+    ],
+    "web novels": [
+      "noveltranslations",
+      "ProgressionFantasy"
+    ],
+    "webui": [
+      "OpenWebUI",
+      "ollama",
+      "LocalLLaMA"
+    ],
+    "west ham": [
+      "Hammers",
+      "PremierLeague",
+      "soccer"
+    ],
+    "wheel strategy": [
+      "options",
+      "stocks"
+    ],
+    "windsurf": [
+      "windsurf",
+      "ChatGPTCoding",
+      "OpenAI"
+    ],
+    "wireguard": [
+      "WireGuard",
+      "selfhosted",
+      "sysadmin"
+    ],
+    "world cup": [
+      "worldcup",
+      "soccer"
+    ],
+    "world news": [
+      "worldnews",
+      "news",
+      "geopolitics"
+    ],
+    "world of tanks": [
+      "WorldofTanks"
+    ],
+    "world of warcraft": [
+      "wow",
+      "worldofpvp",
+      "gaming",
+      "CompetitiveWoW"
+    ],
+    "worlds": [
+      "leagueoflegends",
+      "lolesports"
+    ],
+    "wow": [
+      "wow",
+      "worldofpvp",
+      "gaming"
+    ],
+    "wow classic": [
+      "classicwow",
+      "wow"
+    ],
+    "wsb": [
+      "wallstreetbets",
+      "stocks"
+    ],
+    "wuthering waves": [
+      "WutheringWaves"
+    ],
+    "x3d": [
+      "Amd",
+      "buildapc",
+      "hardware"
+    ],
+    "xbox": [
+      "xbox",
+      "xboxone",
+      "gaming"
+    ],
+    "youtube creator": [
+      "youtube",
+      "NewTubers"
+    ],
+    "yu gi oh": [
+      "yugioh",
+      "masterduel"
+    ],
+    "yugioh": [
+      "yugioh",
+      "masterduel"
+    ],
+    "z-wave": [
+      "homeassistant",
+      "smarthome"
+    ],
+    "zelda": [
+      "zelda",
+      "NintendoSwitch",
+      "gaming"
+    ],
+    "zenless zone zero": [
+      "ZZZ_Official"
+    ],
+    "zig": [
+      "Zig",
+      "programming"
+    ],
+    "zigbee": [
+      "homeassistant",
+      "smarthome"
+    ],
+    "zigbee2mqtt": [
+      "homeassistant",
+      "smarthome",
+      "selfhosted"
+    ]
+  },
+  "aliases": {
+    "3dp": "3d printing",
+    "40k": "warhammer 40k",
+    "5600": "ryzen 5600",
+    "7600": "ryzen 7600",
+    "7800x3d": "ryzen 7800x3d",
+    "9800x3d": "ryzen 9800x3d",
+    "a1111": "automatic1111",
+    "ada": "cardano",
+    "adguard": "adguard home",
+    "ae": "after effects",
+    "airfryer": "air fryer",
+    "ally": "rog ally",
+    "altseason": "alt season",
+    "amp": "amps",
+    "anthropic api": "anthropic",
+    "aot": "attack on titan",
+    "ap": "aeropress",
+    "apple tv+": "apple tv",
+    "arb": "arbitrum",
+    "arc": "intel arc",
+    "arch": "arch linux",
+    "argo": "argocd",
+    "argo cd": "argocd",
+    "avax": "avalanche",
+    "avfc": "aston villa",
+    "aw": "apple watch",
+    "award season": "awards season",
+    "b580": "arc b580",
+    "baldurs gate": "baldur's gate",
+    "barca": "barcelona",
+    "battlemage": "arc battlemage",
+    "bayern munich": "bayern",
+    "bb": "bench boost",
+    "bdo": "black desert online",
+    "bg": "board games",
+    "bg3": "baldur's gate",
+    "bgw": "blank gameweek",
+    "bogle": "bogleheads",
+    "bolt": "bolt new",
+    "btc": "bitcoin",
+    "build pc": "build a pc",
+    "bulk": "bulking",
+    "bw selfhosted": "bitwarden self hosted",
+    "bwf": "calisthenics",
+    "c plus plus": "c++",
+    "c sharp": "c#",
+    "cans": "headphones",
+    "career": "career advice",
+    "cc": "credit cards",
+    "ccs": "covered calls",
+    "cf": "cloudflare",
+    "champs": "valorant champions",
+    "civ6": "civilization 6",
+    "ck3": "crusader kings 3",
+    "claude code cli": "claude code",
+    "cod": "call of duty",
+    "comics": "comic books",
+    "compose": "docker compose",
+    "content creator": "content creation",
+    "continue": "continue dev",
+    "copilot": "github copilot",
+    "core ultra": "intel core ultra",
+    "counter strike": "counter-strike",
+    "coys": "tottenham",
+    "cs": "counter strike 2",
+    "cs careers": "cs career",
+    "cs1": "cities skylines",
+    "csgo": "counter strike 2",
+    "csharp": "c#",
+    "csm": "chainsaw man",
+    "csp": "cash secured puts",
+    "cursor ai": "cursor",
+    "custom keebs": "custom keyboards",
+    "cut": "cutting",
+    "d&d": "dungeons and dragons",
+    "dac": "dacs",
+    "davinci": "davinci resolve",
+    "dbd": "dead by daylight",
+    "deck": "steam deck",
+    "deepseek-coder": "deepseek coder",
+    "deepseek-r1": "deepseek r1",
+    "defi": "decentralized finance",
+    "dgw": "double gameweek",
+    "disney+": "disney plus",
+    "dividends": "dividend investing",
+    "dlss3": "dlss",
+    "docker-compose": "docker compose",
+    "drg": "deep rock galactic",
+    "ds": "demon slayer",
+    "ds career": "data science career",
+    "eafc": "ea fc",
+    "edh": "commander",
+    "edm": "electronic music",
+    "epl": "premier league",
+    "eso": "elder scrolls online",
+    "etfs": "etf investing",
+    "eth": "ethereum",
+    "ev": "electric vehicles",
+    "eve": "eve online",
+    "evs": "electric vehicles",
+    "ewc": "esports world cup",
+    "f1": "formula 1",
+    "fantasy bball": "fantasy basketball",
+    "fantasy hoops": "fantasy basketball",
+    "fantasy pl": "fantasy premier league",
+    "fc26": "fc 26",
+    "fdm": "fdm printing",
+    "ff14": "final fantasy xiv",
+    "ffxiv": "final fantasy xiv",
+    "fg": "frame generation",
+    "fgo": "fate grand order",
+    "fh": "fpl free hit",
+    "fi": "financial independence",
+    "fire": "financial independence",
+    "flux dev": "flux",
+    "fm": "football manager",
+    "fnc": "fnatic",
+    "forge ui": "forge",
+    "fpl": "fantasy premier league",
+    "fpv": "fpv drones",
+    "g2": "g2 esports",
+    "galaxy": "samsung galaxy",
+    "geng": "gen g",
+    "gfn": "geforce now",
+    "ggst": "guilty gear strive",
+    "gh actions": "github actions",
+    "gh copilot": "github copilot",
+    "gha": "github actions",
+    "gitlab pipelines": "gitlab ci",
+    "google ai": "google ai studio",
+    "got": "game of thrones",
+    "gpt 4": "gpt-4",
+    "gpt 4o": "gpt-4o",
+    "gpt-4": "gpt 4",
+    "gpt-4o": "gpt 4o",
+    "gpt-5": "gpt 5",
+    "gpt4": "gpt 4",
+    "gpt4o": "gpt 4o",
+    "gpt5": "gpt 5",
+    "gpu": "gpu upgrade",
+    "grad apps": "grad school",
+    "gw2": "guild wars 2",
+    "ha": "home assistant",
+    "handheld pc": "steam deck",
+    "haos": "home assistant",
+    "hf": "hugging face",
+    "high-protein meals": "high protein meals",
+    "hiphop": "hip hop",
+    "homelabbing": "homelab",
+    "hotd": "house of the dragon",
+    "hs": "hearthstone",
+    "hsr": "honkai star rail",
+    "hxh": "hunter x hunter",
+    "iac": "infrastructure as code",
+    "iem": "iems",
+    "iem katowice": "katowice",
+    "internship": "internships",
+    "invokeai": "invoke ai",
+    "javascript": "javascript",
+    "jjk": "jujutsu kaisen",
+    "js": "javascript",
+    "k-pop": "kpop",
+    "k8s": "kubernetes",
+    "keebs": "mechanical keyboards",
+    "kobold": "koboldcpp",
+    "ksp": "kerbal space program",
+    "kube": "kubernetes",
+    "l2": "layer 2",
+    "lang graph": "langgraph",
+    "llama.cpp": "llama cpp",
+    "lmstudio": "lm studio",
+    "ln": "light novels",
+    "lol esports": "league of legends esports",
+    "lol pro": "league esports",
+    "lor": "legends of runeterra",
+    "lora": "lora training",
+    "lotr": "lord of the rings",
+    "madrid": "real madrid",
+    "man city": "manchester city",
+    "man u": "manchester united",
+    "man utd": "manchester united",
+    "masters": "valorant masters",
+    "mavs": "mavericks",
+    "mcfc": "manchester city",
+    "mcp servers": "model context protocol",
+    "mcu": "marvel",
+    "mealprep": "meal prep recipes",
+    "mech keys": "mechanical keyboards",
+    "meme coin": "memecoin",
+    "meme coins": "memecoins",
+    "mh": "monster hunter",
+    "mha": "my hero academia",
+    "mhw": "monster hunter",
+    "mhwilds": "monster hunter wilds",
+    "mk": "mechanical keyboards",
+    "ml career": "ai career",
+    "mogrt": "motion graphics",
+    "mousepad": "mousepads",
+    "movie recs": "movie recommendations",
+    "msfs": "microsoft flight simulator",
+    "mtg": "magic the gathering",
+    "mtga": "mtg arena",
+    "navi": "navi cs",
+    "nc": "nextcloud",
+    "netflix recs": "netflix",
+    "next js": "next.js",
+    "nextjs": "next.js",
+    "nfts": "nft",
+    "nix": "nixos",
+    "nms": "no mans sky",
+    "node js": "node.js",
+    "nodejs": "node.js",
+    "nodered": "node red",
+    "notebook lm": "notebooklm",
+    "nufc": "newcastle united",
+    "nvim": "neovim",
+    "obs studio": "obs",
+    "oled": "oled monitors",
+    "on-chain": "onchain",
+    "op": "optimism",
+    "openrouter ai": "openrouter",
+    "openwebui": "open webui",
+    "opmanga": "one piece",
+    "options": "options trading",
+    "oscars": "oscar buzz",
+    "osrs": "old school runescape",
+    "otel": "opentelemetry",
+    "ow2": "overwatch 2",
+    "paperless": "paperless ngx",
+    "pc build help": "pc build",
+    "pf": "personal finance",
+    "pf2e": "pathfinder 2e",
+    "phd app": "phd applications",
+    "pi hole": "pihole",
+    "pixel": "google pixel",
+    "pl": "premier league",
+    "plifting": "powerlifting",
+    "poe": "path of exile",
+    "poe2": "path of exile 2",
+    "pourover": "pour over",
+    "prem": "premier league",
+    "premiere": "premiere pro",
+    "prog fantasy": "progression fantasy",
+    "protein": "protein powder",
+    "prx": "paper rex",
+    "ptcg": "pokemon tcg",
+    "ptcgl": "pokemon tcg live",
+    "ptcgp": "pokemon tcg pocket",
+    "pw": "preworkout",
+    "pw manager": "password managers",
+    "pw managers": "password managers",
+    "py": "python",
+    "qwen2.5 coder": "qwen coder",
+    "r5": "ryzen 5",
+    "r7": "ryzen 7",
+    "r9": "ryzen 9",
+    "replit": "replit agent",
+    "resin printer": "resin printing",
+    "resolve": "davinci resolve",
+    "resume help": "resume",
+    "retro handheld": "retro handhelds",
+    "rezero": "re zero",
+    "rl": "rocket league",
+    "rmt": "rate my team",
+    "romhack": "rom hacking",
+    "roo": "roo code",
+    "roth": "roth ira",
+    "rs3": "runescape",
+    "rt": "ray tracing",
+    "rtx40": "rtx",
+    "rtx50": "rtx",
+    "rx7600": "rx 7600",
+    "rx7700xt": "rx 7700 xt",
+    "rx7800xt": "rx 7800 xt",
+    "rx7900xt": "rx 7900 xt",
+    "rx7900xtx": "rx 7900 xtx",
+    "rx9070": "rx 9070",
+    "rx9070xt": "rx 9070 xt",
+    "sci-fi movies": "sci fi movies",
+    "sd": "stable diffusion",
+    "sdnext": "sd next",
+    "self hosting": "selfhosted",
+    "self-hosted": "selfhosted",
+    "selfhost": "selfhosted",
+    "sen": "sentinels",
+    "sf6": "street fighter 6",
+    "shit coin": "shitcoin",
+    "shit coins": "shitcoins",
+    "smash": "super smash bros",
+    "sol": "solana",
+    "stable swarm": "stable swarm ui",
+    "streamdeck": "stream deck",
+    "sts": "slay the spire",
+    "suno ai": "suno",
+    "swe internship": "software engineer internship",
+    "switches": "keyboard switches",
+    "t1": "t1 esports",
+    "t8": "tekken 8",
+    "tarkov": "escape from tarkov",
+    "tc": "fpl triple captain",
+    "textgen webui": "text generation webui",
+    "tf": "terraform",
+    "tft": "teamfight tactics",
+    "th": "team heretics",
+    "ti": "the international",
+    "tlh": "tax loss harvesting",
+    "tlou": "the last of us",
+    "together": "together ai",
+    "ts": "typescript",
+    "ttg": "tabletop gaming",
+    "tv recs": "tv recommendations",
+    "ucl": "champions league",
+    "ultrawide": "ultrawide monitors",
+    "unifi": "ubiquiti",
+    "v0 dev": "v0",
+    "v60 coffee": "v60",
+    "valorant champs": "valorant champions",
+    "vct": "champions tour",
+    "vct amer": "vct americas",
+    "vct pac": "vct pacific",
+    "vllm inference": "vllm",
+    "vtuber": "vtubers",
+    "warzone": "call of duty",
+    "wc": "fpl wildcard",
+    "wearos": "wear os",
+    "web ui": "open webui",
+    "wg": "wireguard",
+    "wow": "world of warcraft",
+    "wow classic": "classic wow",
+    "wsb": "wallstreetbets",
+    "wuwa": "wuthering waves",
+    "ygo": "yugioh",
+    "ygopro": "yugioh",
+    "yt creator": "youtube creator",
+    "z2m": "zigbee2mqtt",
+    "zzz": "zenless zone zero"
+  }
+}
