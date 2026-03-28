@@ -1,8 +1,11 @@
 import praw, praw.models, time
 import warnings
+import logging
 from typing import Optional, List, TypedDict, NotRequired
 from .config import *
 from typing import Literal
+
+logger = logging.getLogger(__name__)
 
 # Suppress PRAW async warning (we use sync PRAW in async context intentionally)
 warnings.filterwarnings("ignore", message=".*PRAW.*asynchronous.*")
@@ -159,6 +162,49 @@ def get_posts(
             break
     return out
 
+"""Perform a global Reddit search when specific subreddits aren't found."""
+def global_search(
+    query: str,
+    limit: int = 5,
+    time_filter: TopWindow = "day",
+    min_score: int | None = None,
+    with_comments: bool = False
+) -> list[PostData]:
+    reddit = create_reddit_client()
+    fetch_limit = _compute_fetch_limit(limit, min_score)
+    
+    out: list[PostData] = []
+    
+    try:
+        logger.info(
+            "[REDDIT] Executing Global Search: query='%s', time_filter=%s, fetch_limit=%d", 
+            query, time_filter, fetch_limit
+        )
+        # PRAW .search on subreddit("all")
+        listing = reddit.subreddit("all").search(query, time_filter=time_filter, limit=fetch_limit)
+        
+        for sub in listing:
+            if not _is_valid_submission(sub, min_score=min_score, allow_stickied=False, min_title_len=10, only_text_posts=False):
+                continue
+            
+            post = submission_to_post_data(sub)
+            if with_comments:
+                comment = fetch_comments_flat_with_context(sub, comment_limit=DEFAULT_COMMENT_LIMIT, sort="top")
+                post["comments"] = comment
+            out.append(post)
+            if len(out) >= limit:
+                break
+                
+        subreddits_found = list(set([p.get('permalink', '').split('/')[4] for p in out if p.get('permalink')]))
+        logger.info(
+            "[REDDIT] Global Search Complete: query='%s', posts_found=%d, subreddits_hit=%s",
+            query, len(out), subreddits_found
+        )
+    except Exception as e:
+        logger.error("[REDDIT] Global search failed for query='%s': %s", query, e)
+            
+    return out
+
 """Ergonomic wrapper around `get_posts` or `get_posts_with_comments` for hot listing."""
 def get_hot_posts(
     subreddit: str,
@@ -195,6 +241,37 @@ def get_new_posts(
         return get_posts_with_comments(subreddit, sort="new", requested=limit, min_score=min_score, comment_limit=DEFAULT_COMMENT_LIMIT)
     else:
         return get_posts(subreddit, sort="new", requested=limit, min_score=min_score)
+
+"""Ergonomic wrapper to perform an active search within a specific subreddit."""
+def get_search_posts(
+    subreddit: str,
+    query: str,
+    limit: int = TOP_LIMIT,
+    time_filter: TopWindow = "day",
+    min_score: int | None = None,
+    with_comments: bool = False,
+) -> List[PostData]:
+    sr = create_subreddit_client(subreddit)
+    fetch_limit = _compute_fetch_limit(limit, min_score)
+    out: list[PostData] = []
+    
+    try:
+        listing = sr.search(query, sort="relevance", time_filter=time_filter, limit=fetch_limit)
+        for sub in listing:
+            if not _is_valid_submission(sub, min_score=min_score, allow_stickied=False, min_title_len=10, only_text_posts=False):
+                continue
+            
+            post = submission_to_post_data(sub)
+            if with_comments:
+                comment = fetch_comments_flat_with_context(sub, comment_limit=DEFAULT_COMMENT_LIMIT, sort="top")
+                post["comments"] = comment
+            out.append(post)
+            if len(out) >= limit:
+                break
+    except Exception as e:
+        logger.error("[REDDIT] Subreddit search failed for sr='%s', query='%s': %s", subreddit, query, e)
+            
+    return out
 
 """Walk a comment forest (list of top-level comments) in DFS order, returning a flat list with context."""
 def _walk_thread_flat_with_context(cforest, limit: int) -> list[CommentData]:

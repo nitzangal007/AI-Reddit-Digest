@@ -22,6 +22,8 @@ OVER_FETCH_FACTOR = 5  # Fetch this many times the TOP_LIMIT to allow filtering
 # Accept both GEMINI_API_KEY and OPENAI_API_KEY (in case user named it differently)
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY") or os.getenv("OPENAI_API_KEY")
 GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")  # Stable base model
+_fallback_models_str = os.getenv("GEMINI_FALLBACK_MODELS", "gemini-2.5-flash-lite,gemini-2.5-pro,gemini-3-flash-preview,gemini-3.1-flash-lite-preview,gemini-3.1-pro-preview")
+GEMINI_FALLBACK_MODELS = [m.strip() for m in _fallback_models_str.split(",") if m.strip()]
 
 # =============================================================================
 # Telegram Bot Configuration

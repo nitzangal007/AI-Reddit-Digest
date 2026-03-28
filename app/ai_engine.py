@@ -3,10 +3,12 @@
 # Universal topic-aware prompts, mismatch detection, and grounded responses
 
 import logging
+from datetime import datetime
+from google.api_core import exceptions as google_exceptions
 import google.generativeai as genai
 from typing import Optional, List, Dict
 from dataclasses import dataclass
-from .config import GEMINI_API_KEY, GEMINI_MODEL
+from .config import GEMINI_API_KEY, GEMINI_MODEL, GEMINI_FALLBACK_MODELS
 from .reddit_client import PostData
 
 logger = logging.getLogger(__name__)
@@ -21,10 +23,122 @@ def configure_gemini():
         raise RuntimeError("GEMINI_API_KEY is required. Add it to your .env file.")
     genai.configure(api_key=GEMINI_API_KEY)
 
-def get_gemini_model():
+def get_gemini_model(model_name: str = GEMINI_MODEL):
     """Get the configured Gemini model."""
     configure_gemini()
-    return genai.GenerativeModel(GEMINI_MODEL)
+    return genai.GenerativeModel(model_name)
+
+# =============================================================================
+# Multi-Model Fallback Telemetry (In-Memory)
+# =============================================================================
+
+_model_call_stats: Dict[str, Dict[str, int]] = {
+    GEMINI_MODEL: {"success": 0, "quota_error": 0, "other_error": 0}
+}
+for fm in GEMINI_FALLBACK_MODELS:
+    if fm not in _model_call_stats:
+        _model_call_stats[fm] = {"success": 0, "quota_error": 0, "other_error": 0}
+
+_last_quota_error_time: Optional[datetime] = None
+_current_primary_model: str = GEMINI_MODEL
+_validated_models: Optional[List[str]] = None
+
+
+def validate_gemini_models() -> List[str]:
+    """Validate configured Gemini models against the API to ensure they exist and support generation."""
+    global _validated_models
+    if _validated_models is not None:
+        return _validated_models
+        
+    configure_gemini()
+    
+    available_models = []
+    try:
+        # Fetch all available models from Gemini
+        for m in genai.list_models():
+            if 'generateContent' in m.supported_generation_methods:
+                name = m.name.replace('models/', '')
+                available_models.append(name)
+    except Exception as e:
+        logger.warning(f"[AI] Failed to fetch model list from Gemini API: {e}. Blindly accepting configured models.")
+        _validated_models = [GEMINI_MODEL] + [m for m in GEMINI_FALLBACK_MODELS if m != GEMINI_MODEL]
+        return _validated_models
+        
+    configured = [GEMINI_MODEL] + [m for m in GEMINI_FALLBACK_MODELS if m != GEMINI_MODEL]
+    valid = []
+    
+    for model_name in configured:
+        if model_name in available_models or f"models/{model_name}" in available_models:
+            valid.append(model_name)
+            logger.info(f"[AI] Validation passed for model: {model_name}")
+        else:
+            logger.warning(f"[AI] Validation failed: Model '{model_name}' is not available (e.g. preview not released) or doesn't support generation. Skipping securely.")
+            
+    if not valid:
+        logger.error("[AI] No configured Gemini models are valid! Falling back to base GEMINI_MODEL as a last resort.")
+        valid = [GEMINI_MODEL]
+        
+    _validated_models = valid
+    return valid
+
+
+def get_queue_status() -> Dict:
+    """Return current telemetry and fallback status for Telegram /queue command."""
+    return {
+        "primary_model": GEMINI_MODEL,
+        "current_active_model": _current_primary_model,
+        "fallback_models": GEMINI_FALLBACK_MODELS,
+        "validated_models": _validated_models if _validated_models is not None else [],
+        "stats": _model_call_stats,
+        "last_quota_error": _last_quota_error_time.isoformat() if _last_quota_error_time else None
+    }
+
+
+def _generate_with_fallback(prompt: str) -> str:
+    """Attempt generation with primary model, fallback on quota errors."""
+    global _current_primary_model, _last_quota_error_time
+    
+    # Always try the primary model first, then the fallbacks, but only use validated ones
+    models_to_try = validate_gemini_models()
+    
+    last_error = None
+    
+    for model_name in models_to_try:
+        try:
+            model = get_gemini_model(model_name)
+            
+            if model_name == GEMINI_MODEL:
+                logger.debug(f"[AI] AI Generation utilizing primary model: {model_name}")
+            else:
+                logger.info(f"[AI] Attempting fallback generation with model: {model_name}")
+                
+            response = model.generate_content(prompt)
+            
+            # Record success
+            _model_call_stats[model_name]["success"] += 1
+            if _current_primary_model != model_name:
+                logger.info(f"[AI] Fallback successful. Model {model_name} generated the response.")
+                _current_primary_model = model_name
+                
+            return response.text.strip()
+            
+        except google_exceptions.ResourceExhausted as e:
+            logger.warning(f"[AI] Quota exceeded for model {model_name}. Attempting fallback...")
+            _model_call_stats[model_name]["quota_error"] += 1
+            _last_quota_error_time = datetime.now()
+            last_error = e
+            continue
+            
+        except Exception as e:
+            logger.error(f"[AI] Unexpected error generating with {model_name}: {e}")
+            _model_call_stats[model_name]["other_error"] += 1
+            raise e
+            
+    logger.error("[AI] All Gemini fallback models exhausted. Generation failed.")
+    if last_error:
+        raise last_error
+    raise RuntimeError("Generation failed across all configured models.")
+
 
 
 # =============================================================================
@@ -217,16 +331,21 @@ def get_prompt_for_intent(
     formatted_posts: str,
     num_posts: int,
     detected_entities: list[str] = None,
-    conversation_context: str = ""
+    conversation_context: str = "",
+    is_global_search: bool = False
 ) -> str:
-    """
-    Generate the appropriate prompt based on user intent.
-    """
+    """Generate the appropriate prompt based on user intent via the prompt registry."""
+    from .prompts import BASE_SYSTEM_PROMPT, INTENT_TEMPLATES
+    
     time_label = TIME_LABELS.get(time_range, time_range)
     entities_str = ", ".join(detected_entities) if detected_entities else "none specifically"
     
-    # Base context that all prompts share
-    base_context = f"""You are Reddit Digest, a knowledgeable assistant that summarizes Reddit discussions.
+    global_note = ""
+    if is_global_search:
+        global_note = "\n[NOTE]: I couldn't find a dedicated subreddit for this, so I searched Reddit globally to find these posts. Please mention this briefly in your response.\n"
+
+    # Assemble base context
+    base_context = f"""{BASE_SYSTEM_PROMPT}
 
 === USER'S QUESTION ===
 {user_question}
@@ -234,88 +353,18 @@ def get_prompt_for_intent(
 === CONTEXT ===
 Topic: {topic}
 Time range: {time_label}
-Specific entities mentioned: {entities_str}
+Entities mentioned: {entities_str}
 Number of posts: {num_posts}
-{f"Previous context: {conversation_context}" if conversation_context else ""}
+{f"Previous context: {conversation_context}" if conversation_context else ""}{global_note}
 
 === REDDIT DATA ===
 {formatted_posts}
-
-=== CRITICAL RULES ===
-1. ONLY use information from the Reddit posts above. Do not hallucinate facts.
-2. Start by DIRECTLY ANSWERING the user's specific question.
-3. If the user asked a comparative question (which is best/preferred), give a clear answer with evidence.
-4. Always ground your claims in the Reddit data (e.g., "Based on this week's discussions...")
-5. If posts don't contain enough info to answer, say so honestly.
-6. Sound like a friendly, knowledgeable Reddit power-user, not a corporate blog.
-7. For any claim that is not directly confirmed by an official source, explicitly prefix it with a qualifier such as 'According to community speculation,' or 'Unconfirmed reports suggest.' Never present community opinion or rumor as established fact.
-8. Ensure your summary covers multiple distinct topics or angles when available. Do not let a single controversy or viral post dominate the entire response."""
-
-    # Intent-specific formatting
-    if intent == "highlights":
-        return f"""{base_context}
-
-=== FORMAT: HIGHLIGHTS ===
-Start with: "Here are the key highlights from {topic} {time_label}:"
-- List 3-7 bullet points, each 1-2 sentences
-- Focus on the most upvoted/discussed points
-- End with 1 sentence on overall sentiment if notable
-
-Keep it brief and scannable."""
-
-    elif intent == "trending":
-        return f"""{base_context}
-
-=== FORMAT: TRENDING/HOT ===
-Focus on what's generating buzz and WHY:
-1. What's sparking the most debate or engagement?
-2. Any controversies, unexpected takes, or strong opinions?
-3. Use phrases like "sparking debate", "getting a lot of attention", "controversial take"
-4. Mention engagement numbers when notable
-
-Emphasize what's HOT and WHY people care."""
-
-    elif intent == "compare":
-        return f"""{base_context}
-
-=== FORMAT: COMPARISON/OPINION ===
-The user wants to know what people think or prefer. Answer this way:
-1. LEAD WITH THE ANSWER: "Based on the discussions, [X] seems to be..." or "The community appears split between..."  
-2. Give 2-3 bullets showing the main camps/opinions with reasoning
-3. Note any notable minority opinions or caveats
-4. End with your synthesis of the overall sentiment
-
-Be direct - the user wants to know what Reddit thinks."""
-
-    elif intent == "help":
-        return f"""{base_context}
-
-=== FORMAT: EXPLANATION ===
-The user wants to understand something. Use the Reddit posts as examples:
-1. Brief explanation of the concept/topic
-2. What the community is saying about it
-3. Any tips or insights from experienced users
-Keep it educational but grounded in the discussions."""
-
-    else:  # summarize (default)
-        return f"""{base_context}
-
-=== FORMAT: SUMMARY ===
-Structure your response like this:
-
-**Direct Answer**: (1-2 sentences answering the user's specific question)
-
-**What's Being Discussed**: 
-- Bullet 1 (key theme/discussion)
-- Bullet 2
-- Bullet 3
-
-**Notable Takes**: (if applicable)
-- Any interesting minority opinions or debates
-
-**Bottom Line**: (1 sentence takeaway)
-
-Write naturally, 200-350 words total."""
+"""
+    
+    # Get specific intent template, default to summarize
+    intent_template = INTENT_TEMPLATES.get(intent, INTENT_TEMPLATES["summarize"])
+    
+    return f"{base_context}\n{intent_template}"
 
 
 def get_followup_prompt(
@@ -429,8 +478,6 @@ What else can I help with?"""
 
 def summarize_single_post(post: PostData) -> str:
     """Generate an AI-powered summary for a single post."""
-    model = get_gemini_model()
-    
     post_content = _format_post_for_llm(post, 1)
     
     prompt = f"""Summarize this Reddit post in 2-4 sentences.
@@ -441,8 +488,7 @@ Focus on: the main point, notable community reactions, and why it matters.
 Be concise and informative."""
 
     try:
-        response = model.generate_content(prompt)
-        return response.text.strip()
+        return _generate_with_fallback(prompt)
     except Exception as e:
         return f"Error summarizing post: {str(e)}"
 
@@ -459,7 +505,9 @@ def generate_response(
     previous_question: str = "",
     previous_topic: str = "",
     previous_time_range: str = "",
-    follow_type: str = ""
+    follow_type: str = "",
+    is_global_search: bool = False,
+    skip_mismatch_check: bool = False
 ) -> str:
     """
     Main function to generate AI responses.
@@ -474,14 +522,14 @@ def generate_response(
         return get_no_posts_response(topic, time_range, detected_entities)
     
     # Check for topic mismatch
-    # SKIPPING if explicit entities were detected. 
+    # SKIPPING if explicit entities were detected or manually skipped. 
     # The NLU registry is highly accurate. If it routed via an entity override (e.g. 'TFT' -> 'TeamfightTactics'), 
     # we shouldn't let the LLM's generic keyword detector second-guess it.
     is_mismatch = False
     actual_topic = ""
     confidence = 0.0
     
-    if not detected_entities:
+    if not detected_entities and not skip_mismatch_check:
         is_mismatch, actual_topic, confidence = detect_topic_mismatch(topic, posts)
         
     if is_mismatch and confidence > 0.3:
@@ -517,11 +565,11 @@ def generate_response(
             formatted_posts=formatted_posts,
             num_posts=num_posts,
             detected_entities=detected_entities,
-            conversation_context=conversation_context
+            conversation_context=conversation_context,
+            is_global_search=is_global_search
         )
     
     # Generate response
-    model = get_gemini_model()
     try:
         logger.info(
             "[AI] Generating response: topic=%s, intent=%s, "
@@ -529,14 +577,43 @@ def generate_response(
             topic, intent, len(posts), is_followup,
             user_question[:60]
         )
-        response = model.generate_content(prompt)
-        return response.text.strip()
+        return _generate_with_fallback(prompt)
     except Exception as e:
         logger.error(
             "[AI] Error generating response: %s, query='%s'",
             e, user_question[:60]
         )
-        return f"Error generating response: {str(e)}"
+        
+        # Build a structured debug validation fallback
+        retrieval_mode = "Passive Listing Mode"
+        if is_global_search:
+            retrieval_mode = "Global Search"
+        elif detected_entities or intent in ["compare", "shopping", "drama", "help"]:
+            retrieval_mode = "Active Subreddit Search"
+            
+        subreddits = list(set([p.get("subreddit", "unknown") for p in posts]))
+        
+        fallback = [
+            "⚠️ **LLM Generation Failed (Quota / Rate Limit)** ⚠️",
+            "Returning Retrieval Validation Debug Output:",
+            "---",
+            f"**Detected Intent:** `{intent}`",
+            f"**Detected Entities:** `{detected_entities}`",
+            f"**Retrieval Mode:** `{retrieval_mode}`",
+            f"**Targeted Subreddits:** `{subreddits}`",
+            f"**Total Posts Fetched:** `{len(posts)}`",
+            "---",
+            "**Top Fetched Posts:**"
+        ]
+        
+        for i, p in enumerate(posts[:5]):
+            title = p.get('title', 'Unknown Title')
+            sub = p.get('subreddit', 'unknown')
+            fallback.append(f"{i+1}. [r/{sub}] {title}")
+            
+        fallback.append("\n*(This debug mode was triggered instead of a hard crash so you can validate Stage 6 routing without LLM quotas blocking you.)*")
+        
+        return "\n".join(fallback)
 
 
 # =============================================================================

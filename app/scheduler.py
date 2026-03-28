@@ -36,15 +36,17 @@ def log_digest(content: str, topic: str):
     return log_file
 
 
-def generate_weekly_digest(topic: str, callback: Optional[Callable] = None) -> str:
-    """Generate a weekly digest for a topic."""
+def generate_weekly_digest(topic: str, callback: Optional[Callable] = None, override_subreddits: Optional[list[str]] = None) -> str:
+    """Generate a weekly digest for a topic or explicit subreddits."""
     handler = ConversationHandler()
     
     # Construct query for weekly summary (English)
-    query = f"What are the most interesting things that happened this week in {topic}?"
-    
-    # Process the query
-    response = handler.process_message(query)
+    if override_subreddits:
+        query = f"What are the most interesting things that happened this week?"
+        response = handler.process_message(query, override_subreddits=override_subreddits)
+    else:
+        query = f"What are the most interesting things that happened this week in {topic}?"
+        response = handler.process_message(query)
     
     # Log the digest
     log_file = log_digest(response, topic)
@@ -57,7 +59,7 @@ def generate_weekly_digest(topic: str, callback: Optional[Callable] = None) -> s
 
 
 def run_scheduled_digests():
-    """Run scheduled digests for all configured topics."""
+    """Run scheduled digests for all configured topics or subreddits."""
     prefs = load_preferences()
     
     if not prefs.weekly_digest_enabled:
@@ -65,13 +67,22 @@ def run_scheduled_digests():
     
     console.print(f"\n🤖 Running scheduled weekly digest...\n", style="bold blue")
     
-    for topic in prefs.weekly_digest_topics:
+    if prefs.favorite_subreddits:
+        topic_name = "Your Subreddits"
         try:
-            console.print(f"📊 Generating digest for: {topic}")
-            digest = generate_weekly_digest(topic)
-            console.print(f"✅ Digest for {topic} complete\n")
+            console.print(f"📊 Generating digest for: {topic_name}")
+            digest = generate_weekly_digest(topic_name, override_subreddits=prefs.favorite_subreddits)
+            console.print(f"✅ Digest for {topic_name} complete\n")
         except Exception as e:
-            console.print(f"❌ Error generating digest for {topic}: {e}", style="red")
+            console.print(f"❌ Error generating digest for {topic_name}: {e}", style="red")
+    else:
+        for topic in prefs.weekly_digest_topics:
+            try:
+                console.print(f"📊 Generating digest for: {topic}")
+                digest = generate_weekly_digest(topic)
+                console.print(f"✅ Digest for {topic} complete\n")
+            except Exception as e:
+                console.print(f"❌ Error generating digest for {topic}: {e}", style="red")
 
 
 def schedule_weekly_digest(day: str = "sunday", time_str: str = "09:00"):
@@ -170,11 +181,20 @@ def get_scheduler_status(language: str = "he") -> str:
 
 
 def run_digest_now(topics: Optional[list[str]] = None):
-    """Run digest immediately for specified topics."""
+    """Run digest immediately for specified topics or subreddits."""
     prefs = load_preferences()
+    results = {}
+    
+    if prefs.favorite_subreddits and not topics:
+        try:
+            digest = generate_weekly_digest("Your Subreddits", override_subreddits=prefs.favorite_subreddits)
+            results["Your Subreddits"] = digest
+        except Exception as e:
+            results["Your Subreddits"] = f"Error: {e}"
+        return results
+        
     topics = topics or prefs.weekly_digest_topics
     
-    results = {}
     for topic in topics:
         try:
             digest = generate_weekly_digest(topic)

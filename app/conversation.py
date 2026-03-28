@@ -293,14 +293,35 @@ Just ask about any of these naturally!
         
         return False, ""
     
-    def _fetch_posts(self, parsed: ParsedQuery, use_cache: bool = True) -> list:
-        """Fetch posts for the given query, using cache if available."""
+    def _fetch_posts(self, parsed: ParsedQuery, use_cache: bool = True,
+                     digest_search_query: Optional[str] = None) -> list:
+        """Fetch posts for the given query, using cache if available.
+        
+        Args:
+            digest_search_query: When set, forces active search mode using this
+                string as the Reddit search query. Used by explicit subreddit
+                digests so they retrieve focused content instead of generic top
+                listings.
+        """
+        
+        # Determine retrieval mode: active search vs passive listing
+        use_search_mode = False
+        if digest_search_query:
+            use_search_mode = True
+        elif parsed.detected_entities:
+            use_search_mode = True
+        elif parsed.intent in ["compare", "shopping", "drama", "help"]:
+            use_search_mode = True
+            
+        search_query = digest_search_query or (parsed.original_query if use_search_mode else None)
+        
         cache_key_params = {
             'subreddits': tuple(sorted(parsed.subreddits)),
             'time_range': parsed.time_range,
             'limit': parsed.limit,
             'topic': parsed.topic,
-            'entities': tuple(sorted(parsed.detected_entities)) if parsed.detected_entities else ()
+            'entities': tuple(sorted(parsed.detected_entities)) if parsed.detected_entities else (),
+            'search_query': search_query
         }
         
         # Check cache first
@@ -321,22 +342,44 @@ Just ask about any of these naturally!
         # Fetch from Reddit - balance breadth vs speed
         all_posts = []
         subreddits_to_try = parsed.subreddits[:3]  # Limit to 3 subreddits for speed
+        is_primary_weighted = bool(digest_search_query) and len(subreddits_to_try) > 1
         
         logger.info(
-            "[CONV] Fetching posts: subreddits=%s, time=%s, topic=%s",
-            subreddits_to_try, parsed.time_range, parsed.topic
+            "[CONV] Fetching posts: subreddits=%s, time=%s, topic=%s, "
+            "search_mode=%s, primary_weighted=%s",
+            subreddits_to_try, parsed.time_range, parsed.topic,
+            use_search_mode, is_primary_weighted
         )
         
-        for subreddit in subreddits_to_try:
+        for idx, subreddit in enumerate(subreddits_to_try):
+            # Fix 3: Primary sub gets more posts; fallback subs get fewer
+            is_primary = (idx == 0)
+            if is_primary_weighted:
+                per_sub_limit = 8 if is_primary else 3
+            else:
+                per_sub_limit = 10 if parsed.time_range == "week" else 5
+            
             try:
-                posts = rc.get_posts_with_comments(
-                    subreddit=subreddit,
-                    sort="top",
-                    time_filter=parsed.time_range,
-                    requested=5,  # 5 posts per subreddit
-                    comment_limit=3,  # Fewer comments for speed
-                    min_score=None  # No score filter for broader results
-                )
+                if use_search_mode:
+                    logger.debug("[CONV] Active Search mode in r/%s for query='%s' (limit=%d)",
+                                 subreddit, search_query, per_sub_limit)
+                    posts = rc.get_search_posts(
+                        subreddit=subreddit,
+                        query=search_query,
+                        limit=per_sub_limit,
+                        time_filter=parsed.time_range,
+                        with_comments=True
+                    )
+                else:
+                    logger.debug("[CONV] Passive Listing mode in r/%s (limit=%d)", subreddit, per_sub_limit)
+                    posts = rc.get_posts_with_comments(
+                        subreddit=subreddit,
+                        sort="top",
+                        time_filter=parsed.time_range,
+                        requested=per_sub_limit,
+                        comment_limit=3,  # Fewer comments for speed
+                        min_score=None  # No score filter for broader results
+                    )
                 all_posts.extend(posts)
                 logger.debug(
                     "[CONV] Fetched %d posts from r/%s",
@@ -350,8 +393,9 @@ Just ask about any of these naturally!
                 print_warning(f"Could not fetch from r/{subreddit}: {e}")
         
         all_posts.sort(key=lambda p: p.get('score', 0), reverse=True)
-        # Keep up to 10 posts for AI
-        all_posts = all_posts[:10]
+        # Keep up to configured posts for AI
+        max_total = 15 if parsed.time_range == "week" else 10
+        all_posts = all_posts[:max_total]
         
         logger.info(
             "[CONV] Fetch complete: total_posts=%d, topic=%s, subreddits=%s",
@@ -364,7 +408,7 @@ Just ask about any of these naturally!
         
         return all_posts
     
-    def _try_broader_search(self, parsed: ParsedQuery) -> tuple[list, str]:
+    def _try_broader_search(self, parsed: ParsedQuery, min_wanted: int = 3) -> tuple[list, str]:
         """
         If initial search yields few posts, try broadening within the same domain.
         Returns (posts, adjustment_message).
@@ -392,13 +436,13 @@ Just ask about any of these naturally!
                 confidence=parsed.confidence
             )
             posts = self._fetch_posts(broader_query, use_cache=True)
-            if len(posts) >= 3:
+            if len(posts) >= min_wanted:
                 adjustment_msg = f"(Expanded search to {new_time} to find more posts)"
                 return posts, adjustment_msg
         
         return [], ""
     
-    def process_message(self, user_message: str) -> str:
+    def process_message(self, user_message: str, override_subreddits: Optional[list[str]] = None) -> str:
         """Process a user message and return the response."""
         self.context.message_count += 1
         
@@ -417,6 +461,49 @@ Just ask about any of these naturally!
             parsed = merge_with_previous(user_message, self.context.last_query, follow_type)
         else:
             parsed = parse_user_query(user_message)
+            
+        # === Digest override: normalize subreddits, fix intent, build search query ===
+        digest_search_query = None  # Set when override triggers active search
+        
+        if override_subreddits:
+            from .nlu import normalize_entity
+            from .registry import ENTITY_SUBREDDIT_OVERRIDES
+            
+            normalized_subs = []
+            primary_community = None  # The canonical name for the primary community
+            
+            for sub in override_subreddits:
+                norm = normalize_entity(sub)
+                if norm in ENTITY_SUBREDDIT_OVERRIDES:
+                    override_list = ENTITY_SUBREDDIT_OVERRIDES[norm]
+                    for s in override_list:
+                        if s not in normalized_subs:
+                            normalized_subs.append(s)
+                    # The first entry in the override is the primary community
+                    if primary_community is None:
+                        primary_community = norm  # e.g. "teamfight tactics", "real madrid"
+                else:
+                    # Fallback: strip spaces to make url-safe for PRAW
+                    cleaned = sub.replace(" ", "").replace("r/", "").replace("R/", "")
+                    if cleaned and cleaned not in normalized_subs:
+                        normalized_subs.append(cleaned)
+                    if primary_community is None:
+                        primary_community = sub.strip()
+                        
+            parsed.subreddits = normalized_subs
+            
+            # Fix 1: Force summarize intent — digest should never use help template
+            parsed.intent = "summarize"
+            
+            # Fix 4: Build a focused search query from the primary community name
+            # This drives active search instead of passive listing
+            digest_search_query = primary_community or (normalized_subs[0] if normalized_subs else None)
+            
+            logger.info(
+                "[CONV] Digest override applied: normalized_subs=%s, "
+                "primary_community='%s', intent=%s, search_query='%s'",
+                normalized_subs, primary_community, parsed.intent, digest_search_query
+            )
         
         # Store previous context before updating
         previous_question = self.context.last_user_message
@@ -432,27 +519,35 @@ Just ask about any of these naturally!
         # Show thinking indicator
         print_thinking()
         
-        # === STAGE 2: Safe Fallback Gate ===
-        # If NLU confidence is 'default' (nothing matched), don't fetch irrelevant posts
-        if parsed.confidence == "default":
-            # Extract the user's original terms for a helpful message
-            query_terms = user_message.strip()
-            logger.warning(
-                "[CONV] Safe fallback triggered: confidence=DEFAULT, "
-                "query='%s', would_have_fetched=%s",
-                query_terms[:60], parsed.subreddits
-            )
-            return get_safe_fallback_response(query_terms)
-        
-        # Fetch posts
-        posts = self._fetch_posts(parsed)
-        
-        # If too few posts, try broadening within same domain
+        # === STAGE 4: Dynamic Search Fallback ===
+        is_global_search = False
         adjustment_msg = ""
-        if len(posts) < 3:
-            broader_posts, adjustment_msg = self._try_broader_search(parsed)
-            if broader_posts:
-                posts = broader_posts
+        
+        if parsed.confidence == "default" and not override_subreddits:
+            query_terms = user_message.strip()
+            logger.info(
+                "[CONV] Confidence is DEFAULT. Falling back to global search for: '%s'",
+                query_terms[:60]
+            )
+            from .reddit_client import global_search
+            # Perform global search instead of failing immediately
+            posts = global_search(query_terms, limit=10, time_filter=parsed.time_range)
+            is_global_search = True
+            
+            if not posts:
+                # Still nothing found? Fall back to safety message
+                logger.warning("[CONV] Global search yielded 0 posts. Triggering fail-soft.")
+                return get_safe_fallback_response(query_terms)
+        else:
+            # Fetch posts using normal targeted routing (or overridden subreddits)
+            posts = self._fetch_posts(parsed, digest_search_query=digest_search_query)
+            
+            # If too few posts, try broadening within same domain
+            min_wanted = 10 if parsed.time_range == "week" else 5
+            if len(posts) < min_wanted:
+                broader_posts, adjustment_msg = self._try_broader_search(parsed, min_wanted)
+                if broader_posts:
+                    posts = broader_posts
         
         self.context.last_posts = posts
         
@@ -475,10 +570,20 @@ Just ask about any of these naturally!
         is_followup = follow_type in ["time_change", "topic_correction", "continuation"]
         
         try:
+            # Fix 2: Build clear prompt topic from normalized subreddit names
+            prompt_topic = parsed.topic
+            if override_subreddits and parsed.subreddits:
+                primary_sub = parsed.subreddits[0]  # e.g. "realmadrid", "TeamfightTactics"
+                if len(parsed.subreddits) > 1:
+                    others = ', r/'.join(parsed.subreddits[1:3])
+                    prompt_topic = f"r/{primary_sub} (with supplementary content from r/{others})"
+                else:
+                    prompt_topic = f"r/{primary_sub}"
+                
             response = generate_response(
                 user_question=user_message,
                 posts=posts,
-                topic=parsed.topic,
+                topic=prompt_topic,
                 time_range=parsed.time_range,
                 intent=parsed.intent,
                 detected_entities=parsed.detected_entities,
@@ -486,7 +591,9 @@ Just ask about any of these naturally!
                 previous_question=previous_question,
                 previous_topic=previous_topic,
                 previous_time_range=previous_time_range,
-                follow_type=follow_type
+                follow_type=follow_type,
+                is_global_search=is_global_search,
+                skip_mismatch_check=bool(override_subreddits)
             )
             return response
         except Exception as e:

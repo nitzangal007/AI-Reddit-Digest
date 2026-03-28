@@ -37,6 +37,7 @@ from .email_notifier import (
     send_daily_digest_email,
     send_weekly_digest_email,
 )
+from .ai_engine import get_queue_status
 
 # Regex for HH:MM validation
 TIME_PATTERN = re.compile(r'^([01]\d|2[0-3]):([0-5]\d)$')
@@ -800,12 +801,69 @@ async def set_email_command(update: Update, context: ContextTypes.DEFAULT_TYPE) 
         current = user.email if user.email else "Not set"
         await update.message.reply_text(
             f"**Current email:** {current}\n\n"
-            "To set, use:\n"
-            "`/set_email user@example.com`\n"
-            "`/set_email off` to clear",
+            "To change, use:\n"
+            "`/set_email name@example.com`\n"
+            "`/set_email off` (to disable)",
             parse_mode='Markdown'
         )
 
+
+async def queue_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Handle /queue command - show Gemini quota and fallback status."""
+    status = get_queue_status()
+    
+    primary = status["primary_model"]
+    current = status["current_active_model"]
+    fallbacks = status["fallback_models"]
+    stats = status["stats"]
+    last_error = status["last_quota_error"]
+    
+    # Format fallback string
+    fallback_str = ", ".join(fallbacks) if fallbacks else "None"
+    
+    # Format active state
+    if current == primary:
+        active_str = f"`{current}` 🟢 (Primary)"
+    else:
+        active_str = f"`{current}` 🟡 (Active Fallback)"
+        
+    # Format telemetry
+    telemetry_lines = []
+    for model, metrics in stats.items():
+        success = metrics["success"]
+        quota_err = metrics["quota_error"]
+        other_err = metrics["other_error"]
+        
+        line = f"• **`{model}`**: {success} successes"
+        if quota_err > 0:
+            line += f", {quota_err} quota errors"
+        if other_err > 0:
+            line += f", {other_err} other errors"
+            
+        telemetry_lines.append(line)
+        
+    telemetry_str = "\n".join(telemetry_lines)
+    
+    # Time formatting
+    if last_error:
+        # It's an isoformat string e.g., 2026-03-13T14:32:00.123456
+        time_display = last_error.replace("T", " ")[:19]
+    else:
+        time_display = "No quota errors since restart"
+        
+    message = (
+        "🤖 **Gemini Queue & Quota Status**\n\n"
+        f"**Configured Primary:** `{primary}`\n"
+        f"**Configured Fallbacks:** `{fallback_str}`\n"
+        f"**Currently Using:** {active_str}\n\n"
+        "*(Note: Telemetry is in-memory and only reflects usage since the bot was last restarted. "
+        "Exact remaining quota cannot be provided as the Gemini API free tier does not expose real-time remaining tokens or RPM.)*\n\n"
+        "📊 **Usage Stats:**\n"
+        f"{telemetry_str}\n\n"
+        f"**Last Quota Error:** `{time_display}`"
+    )
+    
+    await update.message.reply_text(message, parse_mode='Markdown')
 
 async def email_digest_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Handle /email_digest on|off command."""
@@ -858,30 +916,46 @@ async def digest_now_command(update: Update, context: ContextTypes.DEFAULT_TYPE)
     await update.message.reply_text("⏳ Generating your digest... This may take a moment.")
     
     try:
-        # Generate digest using user's topics
-        topics = user.topics or ["tech", "ai"]
         handler = get_reddit_handler(chat_id)
         
-        for topic in topics[:2]:  # Limit to 2 topics for quick response
-            query = f"What are the most interesting things happening in {topic}?"
-            # Run in thread to avoid blocking
-            response = await asyncio.to_thread(handler.process_message, query)
+        # Prioritize explicit subreddits to ensure they aren't masked by topics
+        if user.subreddits:
+            query = "What are the most interesting things happening right now?"
+            response = await asyncio.to_thread(handler.process_message, query, override_subreddits=user.subreddits)
+            full_text = f"📊 Your Subreddits Digest:\n\n{response}"
             
-            full_text = f"📊 {topic.upper()} Digest:\n\n{response}"
-            
-            # Split long messages (Telegram limit = 4096 chars)
             if len(full_text) > 4000:
                 for i in range(0, len(full_text), 4000):
                     await update.message.reply_text(full_text[i:i+4000])
             else:
                 await update.message.reply_text(full_text)
-            
-            # Send email copy if enabled
+                
             if user.email_digest_enabled and user.email:
                 try:
-                    send_daily_digest_email(user.email, topic, response)
+                    send_daily_digest_email(user.email, "Your Subreddits", response)
                 except Exception as email_err:
                     logger.error(f"Email send failed for {user.chat_id}: {email_err}")
+                    
+        else:
+            # Generate digest using user's generic topics
+            topics = user.topics or ["tech", "ai"]
+            
+            for topic in topics[:2]:  # Limit to 2 topics for quick response
+                query = f"What are the most interesting things happening in {topic}?"
+                response = await asyncio.to_thread(handler.process_message, query)
+                full_text = f"📊 {topic.upper()} Digest:\n\n{response}"
+                
+                if len(full_text) > 4000:
+                    for i in range(0, len(full_text), 4000):
+                        await update.message.reply_text(full_text[i:i+4000])
+                else:
+                    await update.message.reply_text(full_text)
+                
+                if user.email_digest_enabled and user.email:
+                    try:
+                        send_daily_digest_email(user.email, topic, response)
+                    except Exception as email_err:
+                        logger.error(f"Email send failed for {user.chat_id}: {email_err}")
     except Exception as e:
         logger.error(f"Error generating digest: {e}")
         await update.message.reply_text(f"❌ Error generating digest: {str(e)}")
@@ -954,25 +1028,42 @@ async def send_daily_digests(context: ContextTypes.DEFAULT_TYPE) -> None:
         try:
             handler = get_reddit_handler(user.chat_id)
             
-            for topic in user.topics[:2]:
-                query = f"What are the most interesting things today in {topic}?"
-                response = handler.process_message(query)
+            if user.subreddits:
+                query = "What are the most interesting things today?"
+                response = handler.process_message(query, override_subreddits=user.subreddits)
                 
-                # Send to Telegram (no parse_mode — AI content can break Markdown)
-                full_text = f"📅 Daily {topic.upper()} Digest:\n\n{response}"
+                full_text = f"📅 Daily Subreddits Digest:\n\n{response}"
                 if len(full_text) > 4000:
                     for i in range(0, len(full_text), 4000):
                         await context.bot.send_message(chat_id=user.chat_id, text=full_text[i:i+4000])
                 else:
                     await context.bot.send_message(chat_id=user.chat_id, text=full_text)
                 
-                # Send email copy if enabled
                 if user.email_digest_enabled and user.email:
                     try:
-                        send_daily_digest_email(user.email, topic, response)
-                        logger.info(f"Daily email sent to {user.email} for topic {topic}")
+                        send_daily_digest_email(user.email, "Your Subreddits", response)
+                        logger.info(f"Daily email sent to {user.email}")
                     except Exception as email_err:
                         logger.error(f"Daily email failed for {user.chat_id}: {email_err}")
+                        
+            else:
+                for topic in user.topics[:2]:
+                    query = f"What are the most interesting things today in {topic}?"
+                    response = handler.process_message(query)
+                    
+                    full_text = f"📅 Daily {topic.upper()} Digest:\n\n{response}"
+                    if len(full_text) > 4000:
+                        for i in range(0, len(full_text), 4000):
+                            await context.bot.send_message(chat_id=user.chat_id, text=full_text[i:i+4000])
+                    else:
+                        await context.bot.send_message(chat_id=user.chat_id, text=full_text)
+                    
+                    if user.email_digest_enabled and user.email:
+                        try:
+                            send_daily_digest_email(user.email, topic, response)
+                            logger.info(f"Daily email sent to {user.email} for topic {topic}")
+                        except Exception as email_err:
+                            logger.error(f"Daily email failed for {user.chat_id}: {email_err}")
         except Exception as e:
             logger.error(f"Error sending daily digest to {user.chat_id}: {e}")
 
@@ -996,25 +1087,42 @@ async def send_weekly_digests(context: ContextTypes.DEFAULT_TYPE) -> None:
         try:
             handler = get_reddit_handler(user.chat_id)
             
-            for topic in user.topics[:2]:
-                query = f"What are the most interesting things this week in {topic}?"
-                response = handler.process_message(query)
+            if user.subreddits:
+                query = "What are the most interesting things this week?"
+                response = handler.process_message(query, override_subreddits=user.subreddits)
                 
-                # Send to Telegram (no parse_mode — AI content can break Markdown)
-                full_text = f"📆 Weekly {topic.upper()} Digest:\n\n{response}"
+                full_text = f"📆 Weekly Subreddits Digest:\n\n{response}"
                 if len(full_text) > 4000:
                     for i in range(0, len(full_text), 4000):
                         await context.bot.send_message(chat_id=user.chat_id, text=full_text[i:i+4000])
                 else:
                     await context.bot.send_message(chat_id=user.chat_id, text=full_text)
                 
-                # Send email copy if enabled
                 if user.email_digest_enabled and user.email:
                     try:
-                        send_weekly_digest_email(user.email, topic, response)
-                        logger.info(f"Weekly email sent to {user.email} for topic {topic}")
+                        send_weekly_digest_email(user.email, "Your Subreddits", response)
+                        logger.info(f"Weekly email sent to {user.email}")
                     except Exception as email_err:
                         logger.error(f"Weekly email failed for {user.chat_id}: {email_err}")
+                        
+            else:
+                for topic in user.topics[:2]:
+                    query = f"What are the most interesting things this week in {topic}?"
+                    response = handler.process_message(query)
+                    
+                    full_text = f"📆 Weekly {topic.upper()} Digest:\n\n{response}"
+                    if len(full_text) > 4000:
+                        for i in range(0, len(full_text), 4000):
+                            await context.bot.send_message(chat_id=user.chat_id, text=full_text[i:i+4000])
+                    else:
+                        await context.bot.send_message(chat_id=user.chat_id, text=full_text)
+                    
+                    if user.email_digest_enabled and user.email:
+                        try:
+                            send_weekly_digest_email(user.email, topic, response)
+                            logger.info(f"Weekly email sent to {user.email} for topic {topic}")
+                        except Exception as email_err:
+                            logger.error(f"Weekly email failed for {user.chat_id}: {email_err}")
         except Exception as e:
             logger.error(f"Error sending weekly digest to {user.chat_id}: {e}")
 
@@ -1040,6 +1148,7 @@ async def post_init(application: Application) -> None:
         BotCommand("topics", "List available topics"),
         BotCommand("help", "Show all commands"),
         BotCommand("reset", "Clear all preferences"),
+        BotCommand("queue", "Check quota status & fallback chain"),
     ]
     await application.bot.set_my_commands(commands)
     logger.info("Bot commands registered with Telegram")
@@ -1079,6 +1188,7 @@ def create_application() -> Application:
     application.add_handler(CommandHandler("set_email", set_email_command))
     application.add_handler(CommandHandler("email_digest", email_digest_command))
     application.add_handler(CommandHandler("digest", digest_now_command))
+    application.add_handler(CommandHandler("queue", queue_command))
     
     # Inline keyboard callback handler for settings panel
     application.add_handler(CallbackQueryHandler(settings_callback_handler))

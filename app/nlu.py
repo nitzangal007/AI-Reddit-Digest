@@ -11,7 +11,7 @@ from .registry import TOPIC_KEYWORDS, ENTITY_SUBREDDIT_OVERRIDES, ENTITY_ALIASES
 logger = logging.getLogger(__name__)
 
 TimeRange = Literal["hour", "day", "week", "month", "year", "all"]
-Intent = Literal["summarize", "highlights", "trending", "compare", "help", "settings"]
+Intent = Literal["summarize", "highlights", "trending", "compare", "help", "settings", "shopping", "drama", "news"]
 
 
 @dataclass
@@ -204,16 +204,28 @@ def map_topic_to_subreddits(topic: str, entities: list[str] = None) -> list[str]
 # =============================================================================
 
 INTENT_PATTERNS = {
+    "shopping": [
+        r"\bbest\b.*(for|under|buy|get|build|cheap)", r"\brecommend\b", r"recommendations?",
+        r"buying advice", r"what should i buy", r"worth it", r"worth buying", r"buyer'?s guide"
+    ],
+    "drama": [
+        r"\bdrama\b", r"\bcontroversy\b", r"\bbacklash\b", r"boycott",
+        r"why are people (mad|angry|upset)", r"community sentiment"
+    ],
+    "news": [
+        r"\bnews\b", r"what happened", r"what'?s new", r"update me on",
+        r"announcement", r"patch notes", r"update"
+    ],
     "highlights": [
         r"\bhighlights?\b", r"key points?", r"main points?", r"tldr", r"tl;?dr",
         r"quick (summary|overview)", r"bullet", r"\bbrief\b", r"top \d+", r"best of"
     ],
     "trending": [
         r"\btrending\b", r"\bhot\b", r"\bbuzz\b", r"\bviral\b", r"popular",
-        r"controversial", r"debate", r"drama", r"what.+talking about"
+        r"controversial", r"debate", r"what.+talking about"
     ],
     "compare": [
-        r"which (is |are )?(the )?(best|better|preferred|recommended)",
+        r"which (is |are )?(the )?(best|better|preferred)",
         r"\bcompare\b", r"\bvs\.?\b", r"\bversus\b", r"difference between",
         r"what do (people|users|redditors) (think|prefer|recommend|say)",
         r"opinion on", r"thoughts on", r"how do people feel"
@@ -226,8 +238,7 @@ INTENT_PATTERNS = {
         r"\bsettings?\b", r"\bpreferences?\b", r"configure", r"setup"
     ],
     "summarize": [
-        r"summarize", r"summary", r"what (happened|'s new|'s going on)",
-        r"update me", r"tell me about", r"give me", r"show me"
+        r"summarize", r"summary", r"tell me about", r"give me", r"show me"
     ]
 }
 
@@ -237,7 +248,7 @@ def extract_intent(query: str) -> Intent:
     query_lower = query.lower()
     
     # Check patterns in priority order
-    priority_order = ["compare", "highlights", "trending", "help", "settings", "summarize"]
+    priority_order = ["shopping", "drama", "compare", "news", "highlights", "trending", "help", "settings", "summarize"]
     
     for intent in priority_order:
         patterns = INTENT_PATTERNS.get(intent, [])
