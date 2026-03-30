@@ -128,7 +128,6 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> i
             "Use /help to see available commands."
         )
         return TGConversationHandler.END
-    
     # Start onboarding
     await update.message.reply_text(
         "👋 **Welcome to Reddit Digest Bot!**\n\n"
