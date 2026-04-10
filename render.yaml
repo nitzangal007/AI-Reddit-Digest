@@ -1,0 +1,27 @@
+services:
+  - type: worker
+    name: ai-reddit-summarizer-telegram-bot
+    runtime: python
+    plan: starter
+    buildCommand: pip install -r requirements.txt
+    startCommand: python -m app.telegram_bot
+    autoDeployTrigger: commit
+    envVars:
+      - key: APP_DATA_DIR
+        value: /var/data/reddit_digest
+      - key: TELEGRAM_BOT_TOKEN
+        sync: false
+      - key: REDDIT_CLIENT_ID
+        sync: false
+      - key: REDDIT_CLIENT_SECRET
+        sync: false
+      - key: REDDIT_USER_AGENT
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: GEMINI_MODEL
+        sync: false
+    disk:
+      name: app-data
+      mountPath: /var/data
+      sizeGB: 10

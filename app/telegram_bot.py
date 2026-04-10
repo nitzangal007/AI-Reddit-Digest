@@ -1,11 +1,13 @@
 # app/telegram_bot.py
 # Telegram bot entry point with handlers and onboarding flow
 
-import os
 import re
 import asyncio
 import logging
+import sys
 from datetime import time
+from logging.handlers import RotatingFileHandler
+from pathlib import Path
 from typing import Optional
 
 from telegram import Update, ReplyKeyboardMarkup, ReplyKeyboardRemove, InlineKeyboardMarkup, InlineKeyboardButton
@@ -19,7 +21,12 @@ from telegram.ext import (
     filters
 )
 
-from .config import TOPIC_SUBREDDIT_MAP
+from .config import (
+    APP_LOG_DIR,
+    TELEGRAM_BOT_TOKEN,
+    TOPIC_SUBREDDIT_MAP,
+    validate_runtime_config,
+)
 from .user_store import (
     get_or_create_user, 
     get_user, 
@@ -48,17 +55,43 @@ VALID_DAYS = [
 ]
 
 # Configure logging
-logging.basicConfig(
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    level=logging.INFO
-)
 logger = logging.getLogger(__name__)
 
-# Load token from environment
-TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
+LOG_FILENAME = "app.log"
+LOG_MAX_BYTES = 5 * 1024 * 1024
+LOG_BACKUP_COUNT = 5
 
-if not TELEGRAM_BOT_TOKEN:
-    raise RuntimeError("Missing TELEGRAM_BOT_TOKEN environment variable. Add it to your .env file.")
+
+def setup_logging() -> Path:
+    """Configure console and rotating file logging for the app."""
+    APP_LOG_DIR.mkdir(parents=True, exist_ok=True)
+    log_file = APP_LOG_DIR / LOG_FILENAME
+
+    formatter = logging.Formatter(
+        fmt="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    )
+
+    stream_handler = logging.StreamHandler(sys.stdout)
+    stream_handler.setFormatter(formatter)
+
+    file_handler = RotatingFileHandler(
+        log_file,
+        maxBytes=LOG_MAX_BYTES,
+        backupCount=LOG_BACKUP_COUNT,
+        encoding="utf-8",
+    )
+    file_handler.setFormatter(formatter)
+
+    root_logger = logging.getLogger()
+    root_logger.handlers.clear()
+    root_logger.setLevel(logging.INFO)
+    root_logger.addHandler(stream_handler)
+    root_logger.addHandler(file_handler)
+
+    logging.getLogger("httpx").setLevel(logging.WARNING)
+    logging.getLogger("httpcore").setLevel(logging.WARNING)
+
+    return log_file
 
 
 # =============================================================================
@@ -120,6 +153,7 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> i
     username = update.effective_user.username or ""
     
     user = get_or_create_user(chat_id, username)
+    logger.info("Received /start chat_id=%s onboarding_complete=%s", chat_id, user.onboarding_complete)
     
     if user.onboarding_complete:
         # User already onboarded - show settings
@@ -916,6 +950,12 @@ async def digest_now_command(update: Update, context: ContextTypes.DEFAULT_TYPE)
     
     try:
         handler = get_reddit_handler(chat_id)
+        logger.info(
+            "Manual digest requested chat_id=%s use_subreddits=%s topic_count=%s",
+            chat_id,
+            bool(user.subreddits),
+            len(user.topics or []),
+        )
         
         # Prioritize explicit subreddits to ensure they aren't masked by topics
         if user.subreddits:
@@ -976,6 +1016,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         return
     
     user_message = update.message.text
+    logger.info("Processing chat message chat_id=%s chars=%s", chat_id, len(user_message or ""))
     
     # Get the Reddit conversation handler for this user
     handler = get_reddit_handler(chat_id)
@@ -1041,7 +1082,7 @@ async def send_daily_digests(context: ContextTypes.DEFAULT_TYPE) -> None:
                 if user.email_digest_enabled and user.email:
                     try:
                         send_daily_digest_email(user.email, "Your Subreddits", response)
-                        logger.info(f"Daily email sent to {user.email}")
+                        logger.info("Daily email sent chat_id=%s delivery=subreddits", user.chat_id)
                     except Exception as email_err:
                         logger.error(f"Daily email failed for {user.chat_id}: {email_err}")
                         
@@ -1060,7 +1101,7 @@ async def send_daily_digests(context: ContextTypes.DEFAULT_TYPE) -> None:
                     if user.email_digest_enabled and user.email:
                         try:
                             send_daily_digest_email(user.email, topic, response)
-                            logger.info(f"Daily email sent to {user.email} for topic {topic}")
+                            logger.info("Daily email sent chat_id=%s topic=%s", user.chat_id, topic)
                         except Exception as email_err:
                             logger.error(f"Daily email failed for {user.chat_id}: {email_err}")
         except Exception as e:
@@ -1100,7 +1141,7 @@ async def send_weekly_digests(context: ContextTypes.DEFAULT_TYPE) -> None:
                 if user.email_digest_enabled and user.email:
                     try:
                         send_weekly_digest_email(user.email, "Your Subreddits", response)
-                        logger.info(f"Weekly email sent to {user.email}")
+                        logger.info("Weekly email sent chat_id=%s delivery=subreddits", user.chat_id)
                     except Exception as email_err:
                         logger.error(f"Weekly email failed for {user.chat_id}: {email_err}")
                         
@@ -1119,7 +1160,7 @@ async def send_weekly_digests(context: ContextTypes.DEFAULT_TYPE) -> None:
                     if user.email_digest_enabled and user.email:
                         try:
                             send_weekly_digest_email(user.email, topic, response)
-                            logger.info(f"Weekly email sent to {user.email} for topic {topic}")
+                            logger.info("Weekly email sent chat_id=%s topic=%s", user.chat_id, topic)
                         except Exception as email_err:
                             logger.error(f"Weekly email failed for {user.chat_id}: {email_err}")
         except Exception as e:
@@ -1205,10 +1246,29 @@ def create_application() -> Application:
 
 def main():
     """Start the Telegram bot."""
-    print("🤖 Starting Reddit Digest Telegram Bot...")
-    print("Press Ctrl+C to stop.\n")
-    
+    try:
+        runtime_details = validate_runtime_config()
+    except Exception as exc:
+        logging.basicConfig(
+            format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+            level=logging.ERROR,
+            stream=sys.stderr,
+            force=True,
+        )
+        logging.getLogger(__name__).error("Startup validation failed: %s", exc)
+        raise
+
+    log_file = setup_logging()
+    logger.info("Starting Reddit Digest Telegram Bot")
+    logger.info("Runtime mode=telegram-long-polling")
+    logger.info("Resolved app_data_dir=%s", runtime_details["app_data_dir"])
+    logger.info("Resolved sqlite_db_file=%s", runtime_details["sqlite_db_file"])
+    logger.info("Resolved app_log_dir=%s", runtime_details["app_log_dir"])
+    logger.info("Shared rotating log file=%s max_bytes=%s backup_count=%s", log_file, LOG_MAX_BYTES, LOG_BACKUP_COUNT)
+    logger.info("Render runtime=%s default_app_data_dir=%s", runtime_details["running_on_render"], runtime_details["using_default_app_data_dir"])
+
     application = create_application()
+    logger.info("Digest jobs configured in Telegram worker process")
     
     # Run with long polling
     application.run_polling(allowed_updates=Update.ALL_TYPES)
