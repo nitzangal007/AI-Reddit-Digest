@@ -4,16 +4,14 @@
 import sqlite3
 import json
 import logging
-import os
 from dataclasses import dataclass, field, asdict
 from datetime import datetime
 from pathlib import Path
 from typing import Optional, List
 import threading
 
-# Database file location
-APP_DATA_DIR_ENV = "APP_DATA_DIR"
-DEFAULT_DB_DIR = Path.home() / ".reddit_digest"
+# Database file location — resolved from config.py (single source of truth)
+from .config import APP_DATA_DIR as _APP_DATA_DIR
 DB_FILENAME = "telegram_users.db"
 
 # Thread-local storage for connections
@@ -22,14 +20,13 @@ logger = logging.getLogger(__name__)
 
 
 def get_db_dir() -> Path:
-    """Resolve the SQLite directory from APP_DATA_DIR or local default."""
-    raw_dir = os.getenv(APP_DATA_DIR_ENV)
-    return Path(raw_dir).expanduser() if raw_dir else DEFAULT_DB_DIR
+    """Return the SQLite directory (canonical path from config)."""
+    return _APP_DATA_DIR
 
 
 def get_db_file() -> Path:
-    """Resolve the SQLite database file path."""
-    return get_db_dir() / DB_FILENAME
+    """Return the SQLite database file path."""
+    return _APP_DATA_DIR / DB_FILENAME
 
 
 @dataclass
