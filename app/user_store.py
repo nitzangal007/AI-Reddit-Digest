@@ -3,18 +3,30 @@
 
 import sqlite3
 import json
+import logging
 from dataclasses import dataclass, field, asdict
 from datetime import datetime
 from pathlib import Path
 from typing import Optional, List
 import threading
 
-# Database file location
-DB_DIR = Path.home() / ".reddit_digest"
-DB_FILE = DB_DIR / "telegram_users.db"
+# Database file location — resolved from config.py (single source of truth)
+from .config import APP_DATA_DIR as _APP_DATA_DIR
+DB_FILENAME = "telegram_users.db"
 
 # Thread-local storage for connections
 _local = threading.local()
+logger = logging.getLogger(__name__)
+
+
+def get_db_dir() -> Path:
+    """Return the SQLite directory (canonical path from config)."""
+    return _APP_DATA_DIR
+
+
+def get_db_file() -> Path:
+    """Return the SQLite database file path."""
+    return _APP_DATA_DIR / DB_FILENAME
 
 
 @dataclass
@@ -91,14 +103,18 @@ class TelegramUserPreferences:
 
 def ensure_db_dir():
     """Ensure the database directory exists."""
-    DB_DIR.mkdir(parents=True, exist_ok=True)
+    db_dir = get_db_dir()
+    db_dir.mkdir(parents=True, exist_ok=True)
+    return db_dir
 
 
 def get_connection() -> sqlite3.Connection:
     """Get a thread-local database connection."""
     if not hasattr(_local, 'connection') or _local.connection is None:
         ensure_db_dir()
-        _local.connection = sqlite3.connect(str(DB_FILE), check_same_thread=False)
+        db_file = get_db_file()
+        logger.info("Opening SQLite user store at %s", db_file)
+        _local.connection = sqlite3.connect(str(db_file), check_same_thread=False)
         _local.connection.row_factory = sqlite3.Row
         _init_db(_local.connection)
     return _local.connection
