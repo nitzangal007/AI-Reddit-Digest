@@ -356,12 +356,15 @@ async def onboarding_email(update: Update, context: ContextTypes.DEFAULT_TYPE) -
     user = get_user(chat_id)
     text = update.message.text
     
-    if "skip" not in text.lower() and "@" in text:
+    if "@" in text and "." in text and "skip" not in text.lower():
         user.email = text.strip()
         await update.message.reply_text(f"✅ Email set: {user.email}")
-    else:
+    elif "skip" in text.lower():
         user.email = ""
         await update.message.reply_text("✅ No email configured")
+    else:
+        await update.message.reply_text("❌ Please enter a valid email address or type 'skip'.")
+        return ONBOARDING_EMAIL
     
     # Complete onboarding
     user.onboarding_complete = True
