@@ -75,8 +75,8 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--language", "-l",
         choices=["he", "en"],
-        default="he",
-        help="Language for responses (default: he)"
+        default="en",
+        help="[Deprecated] Responses are English-only; this flag is ignored."
     )
 
     return parser
@@ -135,15 +135,15 @@ def run_chat_mode():
     run_interactive_chat()
 
 
-def run_single_query(query: str, language: str = "he"):
-    """Run a single query and print the response."""
+def run_single_query(query: str, language: str = "en"):
+    """Run a single query and print the response. (language is accepted for CLI
+    compatibility but ignored — responses are English-only.)"""
     from app.conversation import ConversationHandler
     from app.formatter import print_response, print_thinking
-    
+
     handler = ConversationHandler()
-    handler.context.language = language
-    
-    print_thinking(language)
+
+    print_thinking()
     response = handler.process_message(query)
     print_response(response)
 

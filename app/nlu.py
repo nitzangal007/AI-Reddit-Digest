@@ -299,9 +299,11 @@ CORRECTION_PATTERNS = [
     r"(now|instead|actually|rather)\s*(for|about|focus on|show me)",
     r"(change|switch) (it |)(to|the topic to)",
     # Time corrections
-    r"(ok|okay|sure|alright)[,.]?\s*(so |now )?(change|switch|try|make it|do)",
-    r"(same|that) (but |)(for |about |)(this |last |the |)(week|month|year|day)",
-    r"(for |)(this |last |)(week|month|year)( instead)?$",
+    # NOTE (Task 1.1 / finding C2): three broad time patterns were removed here.
+    # They matched ordinary second-turn queries ending in "this week/month/year"
+    # and "ok/okay ...", which caused normal new queries to be misread as
+    # corrections. Genuine time refinements are still caught by detect_time_change
+    # + SAME_TOPIC_MODIFIERS in conversation.py.
 ]
 
 

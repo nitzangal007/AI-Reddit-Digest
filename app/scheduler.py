@@ -11,6 +11,7 @@ from pathlib import Path
 from .user_preferences import load_preferences
 from .conversation import ConversationHandler
 from .formatter import console
+from .config import TOPIC_SUBREDDIT_MAP
 
 
 # Log file for scheduled runs
@@ -46,7 +47,11 @@ def generate_weekly_digest(topic: str, callback: Optional[Callable] = None, over
         response = handler.process_message(query, override_subreddits=override_subreddits)
     else:
         query = f"What are the most interesting things that happened this week in {topic}?"
-        response = handler.process_message(query)
+        # Route via the mapped subreddits so keywordless topics don't collapse to
+        # a weak global search (finding H2 / Task 1.4).
+        response = handler.process_message(
+            query, override_subreddits=TOPIC_SUBREDDIT_MAP.get(topic, [topic])
+        )
     
     # Log the digest
     log_file = log_digest(response, topic)

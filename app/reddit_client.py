@@ -36,6 +36,7 @@ class PostData(TypedDict):
     author: str
     num_comments: int
     permalink: str
+    subreddit: NotRequired[str]
     stickied: NotRequired[bool]
     comments: list[CommentData]  # List of comments
 
@@ -49,6 +50,7 @@ def create_reddit_client() -> praw.Reddit:
         client_id=REDDIT_CLIENT_ID,
         client_secret=REDDIT_CLIENT_SECRET,
         user_agent=REDDIT_USER_AGENT,
+        check_for_updates=False,  # suppress PRAW's red "version outdated" banner
     )
 
 """Return a Subreddit handle"""
@@ -68,6 +70,7 @@ def submission_to_post_data(sub: praw.models.Submission) -> PostData:
         "author": str(sub.author) if sub.author else "[deleted]",
         "num_comments": int(sub.num_comments or 0),
         "permalink": f"https://reddit.com{sub.permalink}",
+        "subreddit": str(sub.subreddit) if getattr(sub, "subreddit", None) else "",
         "stickied": bool(getattr(sub, "stickied", False)),
         "comments": [],  # required by PostData; fill later if needed
     }
