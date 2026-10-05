@@ -984,7 +984,12 @@ async def digest_now_command(update: Update, context: ContextTypes.DEFAULT_TYPE)
             
             for topic in topics[:2]:  # Limit to 2 topics for quick response
                 query = f"What are the most interesting things happening in {topic}?"
-                response = await asyncio.to_thread(handler.process_message, query)
+                # Route via the mapped subreddits so keywordless topics (finance,
+                # news, football, ...) don't collapse to a weak global search (H2).
+                response = await asyncio.to_thread(
+                    handler.process_message, query,
+                    override_subreddits=TOPIC_SUBREDDIT_MAP.get(topic, [topic]),
+                )
                 full_text = f"📊 {topic.upper()} Digest:\n\n{response}"
                 
                 if len(full_text) > 4000:
@@ -1073,7 +1078,7 @@ async def send_daily_digests(context: ContextTypes.DEFAULT_TYPE) -> None:
             
             if user.subreddits:
                 query = "What are the most interesting things today?"
-                response = handler.process_message(query, override_subreddits=user.subreddits)
+                response = await asyncio.to_thread(handler.process_message, query, override_subreddits=user.subreddits)
                 
                 full_text = f"📅 Daily Subreddits Digest:\n\n{response}"
                 if len(full_text) > 4000:
@@ -1092,7 +1097,10 @@ async def send_daily_digests(context: ContextTypes.DEFAULT_TYPE) -> None:
             else:
                 for topic in user.topics[:2]:
                     query = f"What are the most interesting things today in {topic}?"
-                    response = handler.process_message(query)
+                    response = await asyncio.to_thread(
+                        handler.process_message, query,
+                        override_subreddits=TOPIC_SUBREDDIT_MAP.get(topic, [topic]),
+                    )
                     
                     full_text = f"📅 Daily {topic.upper()} Digest:\n\n{response}"
                     if len(full_text) > 4000:
@@ -1132,7 +1140,7 @@ async def send_weekly_digests(context: ContextTypes.DEFAULT_TYPE) -> None:
             
             if user.subreddits:
                 query = "What are the most interesting things this week?"
-                response = handler.process_message(query, override_subreddits=user.subreddits)
+                response = await asyncio.to_thread(handler.process_message, query, override_subreddits=user.subreddits)
                 
                 full_text = f"📆 Weekly Subreddits Digest:\n\n{response}"
                 if len(full_text) > 4000:
@@ -1151,7 +1159,10 @@ async def send_weekly_digests(context: ContextTypes.DEFAULT_TYPE) -> None:
             else:
                 for topic in user.topics[:2]:
                     query = f"What are the most interesting things this week in {topic}?"
-                    response = handler.process_message(query)
+                    response = await asyncio.to_thread(
+                        handler.process_message, query,
+                        override_subreddits=TOPIC_SUBREDDIT_MAP.get(topic, [topic]),
+                    )
                     
                     full_text = f"📆 Weekly {topic.upper()} Digest:\n\n{response}"
                     if len(full_text) > 4000:

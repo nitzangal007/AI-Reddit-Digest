@@ -128,7 +128,21 @@ def _generate_with_fallback(prompt: str) -> str:
             _last_quota_error_time = datetime.now()
             last_error = e
             continue
-            
+
+        except (
+            google_exceptions.ServiceUnavailable,
+            google_exceptions.DeadlineExceeded,
+            google_exceptions.InternalServerError,
+        ) as e:
+            # Transient server-side errors (503/504/500) — try the next model
+            # instead of aborting the whole chain (finding H4).
+            logger.warning(
+                f"[AI] Transient API error ({type(e).__name__}) for model {model_name}. Attempting fallback..."
+            )
+            _model_call_stats[model_name]["other_error"] += 1
+            last_error = e
+            continue
+
         except Exception as e:
             logger.error(f"[AI] Unexpected error generating with {model_name}: {e}")
             _model_call_stats[model_name]["other_error"] += 1
@@ -584,36 +598,35 @@ def generate_response(
             e, user_question[:60]
         )
         
-        # Build a structured debug validation fallback
+        # Log the internal routing detail for debugging — NOT shown to the user.
         retrieval_mode = "Passive Listing Mode"
         if is_global_search:
             retrieval_mode = "Global Search"
         elif detected_entities or intent in ["compare", "shopping", "drama", "help"]:
             retrieval_mode = "Active Subreddit Search"
-            
-        subreddits = list(set([p.get("subreddit", "unknown") for p in posts]))
-        
-        fallback = [
-            "⚠️ **LLM Generation Failed (Quota / Rate Limit)** ⚠️",
-            "Returning Retrieval Validation Debug Output:",
-            "---",
-            f"**Detected Intent:** `{intent}`",
-            f"**Detected Entities:** `{detected_entities}`",
-            f"**Retrieval Mode:** `{retrieval_mode}`",
-            f"**Targeted Subreddits:** `{subreddits}`",
-            f"**Total Posts Fetched:** `{len(posts)}`",
-            "---",
-            "**Top Fetched Posts:**"
+
+        subreddits = list({p.get("subreddit", "unknown") for p in posts})
+        logger.error(
+            "[AI] Generation failed. intent=%s entities=%s mode=%s subreddits=%s posts=%d",
+            intent, detected_entities, retrieval_mode, subreddits, len(posts)
+        )
+
+        # User-facing, friendly fallback: surface the posts we did find so the
+        # reply is still useful even when the LLM is unavailable (finding H4).
+        lines = [
+            "⚠️ The AI summarizer is temporarily unavailable, so here are the top posts I found:",
+            "",
         ]
-        
-        for i, p in enumerate(posts[:5]):
-            title = p.get('title', 'Unknown Title')
-            sub = p.get('subreddit', 'unknown')
-            fallback.append(f"{i+1}. [r/{sub}] {title}")
-            
-        fallback.append("\n*(This debug mode was triggered instead of a hard crash so you can validate Stage 6 routing without LLM quotas blocking you.)*")
-        
-        return "\n".join(fallback)
+        for i, p in enumerate(posts[:5], 1):
+            title = p.get("title", "Unknown title")
+            permalink = p.get("permalink", "")
+            if permalink:
+                lines.append(f"{i}. {title}\n   {permalink}")
+            else:
+                lines.append(f"{i}. {title}")
+        lines.append("")
+        lines.append("Please try again in a moment.")
+        return "\n".join(lines)
 
 
 # =============================================================================

@@ -86,7 +86,7 @@ def detect_topic_correction(message: str) -> Optional[tuple[str, list[str]]]:
     correction_phrases = [
         r"i (meant|mean|was asking about|want)",
         r"no[,.]?\s*(i'?m |i was )?(asking|talking) about",
-        r"(not .+[,.]?\s*)?(i want|give me|show me|focus on)",
+        r"not .+[,.]?\s*(i want|give me|show me|focus on)",
         r"(switch|change) (to|the topic to)",
         r"actually[,.]?\s*(i'?m |i was )?(asking|talking) about",
     ]
@@ -94,8 +94,8 @@ def detect_topic_correction(message: str) -> Optional[tuple[str, list[str]]]:
     msg_lower = message.lower()
     
     is_correction = any(re.search(p, msg_lower) for p in correction_phrases)
-    
-    if is_correction or len(msg_lower.split()) <= 8:
+
+    if is_correction:
         # Try to extract a new topic from the message
         new_topic, entities, _confidence = extract_topic_with_entities(message)
         if new_topic != "tech" or entities:  # Found something specific
@@ -190,7 +190,12 @@ def merge_with_previous(
             merged.detected_entities = entities
             # Recalculate confidence for the new topic — don't inherit stale confidence
             merged.confidence = "high" if entities else "medium"
-    
+        else:
+            # Classified as a correction only by a loose phrase match, with no
+            # concrete new topic to switch to. Parse the message fresh instead of
+            # inheriting the previous query wholesale (finding C2 / Task 1.1).
+            merged = parse_user_query(new_message)
+
     elif follow_type == "continuation":
         # Keep everything, just increase the limit
         merged.limit = min(previous.limit + 5, 20)
@@ -593,7 +598,10 @@ Just ask about any of these naturally!
                 previous_time_range=previous_time_range,
                 follow_type=follow_type,
                 is_global_search=is_global_search,
-                skip_mismatch_check=bool(override_subreddits)
+                # Global search forces a fake "tech" topic (see NLU default), so the
+                # keyword mismatch check would wrongly reject valid results with a
+                # "you asked about tech" message. Skip it here too (finding H1).
+                skip_mismatch_check=bool(override_subreddits) or is_global_search
             )
             return response
         except Exception as e:
