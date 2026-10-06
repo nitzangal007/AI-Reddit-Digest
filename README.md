@@ -1,10 +1,114 @@
-# Reddit Digest — AI-Powered Reddit Summarizer Bot
+# Reddit Digest - AI-Powered Reddit Summarizer Bot
 
-[Try the live Telegram bot](https://t.me/RedditFetch_bot)
+**Currently offline:** The bot was previously deployed on Render, but the hosted service is no longer running. The [previous Telegram bot](https://t.me/RedditFetch_bot) is a historical reference, not an active demo. To use the project, run your own instance with the instructions below.
 
 Reddit Digest is an AI-powered Telegram bot that helps users stay updated on topics they care about by collecting Reddit discussions, extracting relevant posts and comments, and generating concise AI summaries.
 
 The project was built as a personal software engineering project focused on real-world API integration, AI summarization, user preferences, scheduling, logging, and retrieval-quality improvements.
+
+## Run Locally
+
+### 1. Clone the Main Branch and Install Dependencies
+
+Use Python 3.10 or newer, Git, and an internet connection. Run the commands from the repository root. The `main` branch includes the merged `upgrade` changes; no separate feature-branch checkout is needed for these instructions.
+
+```sh
+git clone --branch main https://github.com/nitzangal007/AI-Reddit-Digest.git
+cd AI-Reddit-Digest
+python -m venv .venv
+```
+
+On Windows PowerShell:
+
+```powershell
+.\.venv\Scripts\Activate.ps1
+python -m pip install -r requirements.txt
+Copy-Item .env.example .env
+```
+
+On macOS or Linux, use `python3` instead of `python` when creating the virtual environment, then:
+
+```sh
+source .venv/bin/activate
+python -m pip install -r requirements.txt
+cp .env.example .env
+```
+
+For an existing checkout, use `git switch main` and `git pull --ff-only origin main` before installing dependencies. Copy `.env.example` only when `.env` does not already exist, to preserve your credentials.
+
+If PowerShell blocks activation, use `.\.venv\Scripts\python.exe` instead of `python` in subsequent commands. Activation is a convenience; it is not required.
+
+### 2. Configure Credentials
+
+Edit the local `.env` file and replace the placeholder values:
+
+| Variable | Required for | Purpose |
+|----------|--------------|---------|
+| `REDDIT_CLIENT_ID` | All modes, including CLI help | Reddit API client ID |
+| `REDDIT_CLIENT_SECRET` | All modes, including CLI help | Reddit API client secret |
+| `REDDIT_USER_AGENT` | Recommended for all Reddit requests | An identifying string such as `RedditDigest/0.2 by YourUsername` |
+| `GEMINI_API_KEY` | AI summaries and Telegram startup | Google Gemini API key |
+| `TELEGRAM_BOT_TOKEN` | Telegram mode | Token for your own bot, obtained through Telegram's `@BotFather` |
+| `GEMINI_MODEL` | Optional | Model ID available to your Gemini account; the configured default is in `app/config.py` |
+| `APP_DATA_DIR` | Optional locally | Directory for Telegram SQLite state and rotating application logs |
+
+Reddit credentials require an API application and permitted API access. The application setup page is [Reddit apps](https://www.reddit.com/prefs/apps). Obtain a Gemini key from [Google AI Studio](https://aistudio.google.com/app/apikey). API access, quotas, model availability, and any provider charges depend on your own accounts.
+
+You must supply your own credentials. `.env` is ignored by Git; keep API keys and bot tokens private.
+
+### 3. Start the Telegram Bot
+
+With the virtual environment active and `.env` configured:
+
+```sh
+python -m app.telegram_bot
+```
+
+Open the bot associated with **your token** in Telegram, send `/start`, and complete onboarding. Use `/settings` to configure topics, subreddits, and delivery preferences, then `/digest` to request a digest. You can also send a question such as `What happened this week in AI?`.
+
+The application uses long polling, so local operation does not require a public URL or webhook server. Run only one polling instance per bot token. Keep the process running and the computer awake for scheduled delivery; press `Ctrl+C` to stop it. Digest times use the machine's local timezone, and missed deliveries are not replayed while the process is stopped.
+
+### 4. Use the CLI Instead
+
+CLI chat and AI queries use the same Reddit and Gemini credentials but do not require a Telegram token:
+
+```sh
+python -m app --help
+python -m app --chat
+python -m app --query "What happened this week in AI?"
+```
+
+For the legacy post-fetching mode:
+
+```sh
+python -m app --subreddit machinelearning --sort top --time week --limit 5
+```
+
+The CLI also exposes `--digest-now` and `--schedule` for its own configured weekly digests. CLI preferences are separate from Telegram user preferences. Telegram daily and weekly jobs already run inside `python -m app.telegram_bot`; they do not require a separate CLI scheduler.
+
+### Optional Email Delivery
+
+Uncomment and configure `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD`, and `EMAIL_FROM` in `.env` to enable SMTP delivery. The sender uses STARTTLS; the example uses port `587`. Without SMTP credentials, Telegram and CLI use remain available.
+
+In Telegram, use `/set_email` and `/email_digest` to configure and enable email copies. Actual delivery requires valid SMTP credentials and provider access.
+
+### Local Data and Troubleshooting
+
+By default, Telegram preferences are stored in `~/.reddit_digest/telegram_users.db`, and application logs in `~/.reddit_digest/logs/app.log`. `~` means your home directory. `APP_DATA_DIR` overrides these Telegram paths. The JSON cache, CLI preferences, and generated digest files still use `~/.reddit_digest`, independently of that override.
+
+| Symptom | Check |
+|---------|-------|
+| `Missing required env vars` or startup validation error | Confirm `.env` is in the repository root, placeholders are replaced, and all credentials required for the selected mode are set. |
+| Import error or missing JobQueue | Use the virtual environment and reinstall `requirements.txt`, which includes `python-telegram-bot[job-queue]`. |
+| Bot does not respond | Check the terminal logs, the bot associated with your token, network access, and whether another instance is polling the same token. |
+| Reddit or Gemini request fails | Check API permissions, key validity, quota, and Gemini model availability. Successful startup does not prove external API access. |
+| Scheduled digest does not arrive | Keep the process running, check the machine timezone, and review `/settings` and logs. |
+
+### Hosting Files
+
+`render.yaml` describes a Python background worker with `python -m app.telegram_bot` as its start command and a persistent disk for Telegram state. It is configuration for a future deployment, not evidence that a service is currently hosted. On Render, startup requires `APP_DATA_DIR`; the blueprint sets it to `/var/data/reddit_digest`.
+
+The root `Dockerfile` contains an unrelated Tomcat/JSP setup and does not run this Python bot. Use the Python commands above for local operation.
 
 ---
 
@@ -326,6 +430,7 @@ If enabled, the same digest can also be sent by email.
 |--------|-------------|
 | `/start` | Start onboarding or view current setup |
 | `/settings` | View and change preferences |
+| `/help` | Show available commands |
 | `/digest` | Generate a digest immediately |
 | `/set_frequency` | Configure daily or weekly digest frequency |
 | `/set_time` | Set digest delivery time |
@@ -370,6 +475,6 @@ Planned improvements include:
 
 ## Project Status
 
-The bot is deployed and usable through Telegram.
+The bot was previously deployed on Render and is currently offline. There is no active hosted demo. Local operation requires your own Reddit and Gemini credentials, plus a Telegram bot token for Telegram mode.
 
 This repository is part of an ongoing personal portfolio project focused on AI, automation, and real-world software engineering.
